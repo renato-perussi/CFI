@@ -1,0 +1,1 @@
+export { ConteudoEducativo } from './ConteudoEducativo';
