@@ -1,10 +1,10 @@
 # Sprints — Calculadora de Financiamento Imobiliário
 
 **Projeto:** Calculadora de Financiamento Imobiliário  
-**Base:** PRD v1.3 (implementado e validado em 22/10/2026)  
+**Base:** PRD v1.3 (implementado e validado em 22/10/2026) + PRD §28 / v1.4-draft (refatoração planejada em 22/10/2026, sem mudança funcional)  
 **Metodologia:** Sprints iterativas com entregas incrementais  
 **Stack Frontend:** React 19 + TypeScript ~6.0 + Tailwind CSS 4.3 + Vite 8.1 (Chart.js 4.5, Vitest 5.0, OxLint 1.71)  
-**Status em 22/10/2026:** Sprints 1-11 implementadas (53 testes passando, build limpo, `dist/` 464KB). Git: 1 commit + 31 arquivos modificados não commitados — pendente commit por escopo.
+**Status em 22/10/2026:** Sprints 1-11 implementadas + Sprint 12 (refinos) implementada (53 testes passando, build limpo, `dist/` 464KB). Git: 1 commit + 31 arquivos modificados não commitados — pendente commit por escopo. Sprints 13–18 (refatoração v1.4) planejadas, não iniciadas.
 
 ---
 
@@ -24,6 +24,12 @@
 | Sprint 10 | MVP | Gráficos Adicionais | 3 gráficos: Juros, Amortização, Saldo Devedor |
 | Sprint 11 | MVP | Exportação CSV | Botão exportar, geração de arquivo CSV |
 | Sprint 12 | v1.3 | Refinos pós-MVP (não planejado) | Ponto de equilíbrio, % economia, taxa anual, atalhos, preview financiado, donut, lazy/FadeIn |
+| Sprint 13 | v1.4-refator | Trava de segurança | Testes de caracterização, sem código produtivo |
+| Sprint 14 | v1.4-refator | Derivados puros | `utils/analise.ts` + testes; UI consome |
+| Sprint 15 | v1.4-refator | Parsing único | `parseMoeda/Percentual` central; remove 6 duplicações |
+| Sprint 16 | v1.4-refator | Validação pura | `constants/negocio.ts` + `domain/validacao.ts`; hook fino |
+| Sprint 17 | v1.4-refator | Fatiar componentes + bugfixes seguros | Sub-componentes; `Tabela`/`Grafico`/`InputField` |
+| Sprint 18 | v1.4-refator | Higiene de arquitetura | Barrels, split `csv`, `chart.ts`, `sharing`, lint |
 
 ---
 
@@ -347,6 +353,140 @@
 
 ---
 
+## Sprint 13 — Trava de Segurança (caracterização, sem código produtivo)
+
+**Objetivo:** Travar o comportamento atual antes de qualquer refatoração (RFR-001). Nenhum arquivo produtivo muda nesta sprint.
+
+### Tarefas
+
+| ID | Tarefa | Critério de Aceite |
+|----|--------|-------------------|
+| S13-01 | Criar `src/utils/__tests__/analise.test.ts` com casos de caracterização | Cobre `mesCruzamento` (SAC cruza Price, nunca cruza → `null`, `economia=0`), `%economia` (formato `X,X%`), `principal`, `taxaAnual`, `prazoAnos`, `preview` (regra 20%) |
+| S13-02 | Criar `src/domain/__tests__/validacao.test.ts` vazio ou com casos atuais | Espelha mensagens pt-BR atuais (entrada mínima, taxa >20, prazo >600) como baseline |
+| S13-03 | Rodar baseline | `npx vitest run` com 53 testes existentes PASS; novos testes FAIL (funções ainda não existem) — documentar saída |
+
+### Entregas
+- 2 arquivos de teste de caracterização (vermelhos, aguardando Sprint 14/16)
+- Evidência de baseline registrada
+
+### Dependências
+- Sprints 3, 4, 5 (comportamento a travar)
+
+---
+
+## Sprint 14 — Derivados Puros (`utils/analise.ts`)
+
+**Objetivo:** Remover toda lógica derivada de UI para funções puras testadas (RFR-002). Núcleo `calculos.ts` intocado.
+
+### Tarefas
+
+| ID | Tarefa | Onde | Critério de Aceite |
+|----|--------|------|-------------------|
+| S14-01 | Criar `src/utils/analise.ts`: `calcularMesCruzamento(tabelaSAC, tabelaPrice): number \| null` | Novo | Scan linear extraído de `ComparacaoFinanciamento.tsx:19-28`, sem `useMemo` |
+| S14-02 | `calcularPercentualEconomia(economia, maiorTotal): string` + `calcularValorPrincipal(totalPago, totalJuros): number` | Novo | Substitui `Comparacao:30-37` e `ResultadoHeader:19-25`; formato `pt-BR 1 casa` via `format.ts` |
+| S14-03 | `calcularTaxaAnualEquivalente(taxaMensal)`, `formatarPrazoEmAnos(prazo)`, `calcularPercentualEntrada()`, `calcularValorFinanciadoPreview()` | Novo | Extraídos de `FormCalculator.tsx:34-62`; recebem números, não strings mascaradas |
+| S14-04 | Refatorar consumidores | `ComparacaoFinanciamento.tsx`, `ResultadoHeader.tsx`, `FormCalculator.tsx` | UI só chama `analise.ts`; S13-01 fica verde sem alterar snapshots |
+| S14-05 | Verificação | `calculadora-fi/` | `npx vitest run src/utils/__tests__/analise.test.ts` PASS + `npm run build` OK |
+
+### Entregas
+- `analise.ts` + testes verdes; 3 componentes sem `Math.pow/toLocaleString/scan` inline
+
+### Dependências
+- Sprint 13 (testes vermelhos)
+
+---
+
+## Sprint 15 — Parsing Único (`format.ts`)
+
+**Objetivo:** Centralizar parsing/formatação e eliminar 6 duplicações (RFR-003).
+
+### Tarefas
+
+| ID | Tarefa | Onde | Critério de Aceite |
+|----|--------|------|-------------------|
+| S15-01 | Adicionar `parseMoedaParaNumero(str): number`, `parsePercentualParaNumero(str): number`, `formatarPercentual(valor, casas=1): string` | `src/utils/format.ts` | Inversas exatas da máscara `/100`; `''` → `0`/`NaN` documentado |
+| S15-02 | Substituir parsing manual | `useFormCalculator.ts:37-38,157-158`, `FormCalculator.tsx:29-31` | Zero ocorrências de `replace(/\./g,'')` fora de `format.ts` (`rg` comprova) |
+| S15-03 | Substituir `toLocaleString` ad-hoc | `FormCalculator.tsx:36,44`, `ComparacaoFinanciamento.tsx:33` | Tudo via `format.ts`/`analise.ts` |
+| S15-04 | Estender testes | `src/utils/__tests__/format.test.ts` | Casos `30000000→300.000,00`, `085→0,85`, `''`, `0,00`, round-trip máscara→parse |
+| S15-05 | Verificação | `calculadora-fi/` | `npx vitest run src/utils/__tests__/format.test.ts src/hooks/__tests__/useFormCalculator.test.ts src/components/form/__tests__/FormCalculator.test.tsx` PASS |
+
+### Entregas
+- Parsing único + testes; `grep` sem duplicação residual
+
+### Dependências
+- Sprint 14 (assinaturas de `analise.ts` estáveis)
+
+---
+
+## Sprint 16 — Validação Pura (`domain/validacao.ts`)
+
+**Objetivo:** Desacoplar regra de negócio de máscara/UI (RFR-004).
+
+### Tarefas
+
+| ID | Tarefa | Onde | Critério de Aceite |
+|----|--------|------|-------------------|
+| S16-01 | Criar `src/constants/negocio.ts` | Novo | `ENTRADA_MINIMA=0.2, TAXA_MAXIMA=20, PRAZO_MAXIMO=600, ITENS_POR_PAGINA=20` + `ENTRADAS_SUGERIDAS/PRAZOS_SUGERIDOS` (movidos de `FormCalculator`) |
+| S16-02 | Criar `src/domain/validacao.ts`: `validateFinanciamento({valorImovel, entrada, taxaJuros, prazoMeses}: numbers, minimoFormatado?: string)` | Novo | Puro, sem importar `format.ts`; mensagens pt-BR idênticas às atuais |
+| S16-03 | Afinar `useFormCalculator` | `src/hooks/useFormCalculator.ts` | Vira adaptador: parse (`format.ts`) → valida (`domain`) → formata mensagem; unifica `handleChange/handleBlur` via helper `revalidarCruzada()`; elimina `formatarEntradaMoeda()` de dentro de `validate()` |
+| S16-04 | Cobrir bordas | `src/domain/__tests__/validacao.test.ts`, `src/hooks/__tests__/useFormCalculator.test.ts` | `entrada>=valor`, `prazo>600/<=0`, `valor<=0`, revalidação cruzada `valorImovel→entrada` |
+| S16-05 | Verificação | `calculadora-fi/` | `npx vitest run src/domain src/hooks` PASS; mensagens inalteradas |
+
+### Entregas
+- Validador puro + constantes; hook fino sem lógica de negócio inline
+
+### Dependências
+- Sprint 15 (parsing central disponível)
+
+---
+
+## Sprint 17 — Fatiar Componentes + Bugfixes Seguros
+
+**Objetivo:** Quebrar 3 arquivos >200 linhas e corrigir 2 anti-patterns sem mudar pixels (RFR-005/RFR-006).
+
+### Tarefas
+
+| ID | Tarefa | Onde | Critério de Aceite |
+|----|--------|------|-------------------|
+| S17-01 | Fatiar `ComparacaoFinanciamento.tsx:244` | Novos `results/CartaoRecomendacao.tsx` + `GradeGraficos.tsx` + `AbasTabelas.tsx` | Orquestrador ~60 linhas; tabs `SAC/PRICE` + `BotaoExportarCSV` preservados; `key="sac-table"/"price-table"` mantido |
+| S17-02 | Fatiar `FormCalculator.tsx:228` | Novos `form/AtalhosEntrada.tsx` + `AtalhosPrazo.tsx` + `PreviewPrincipal.tsx` | Atalhos 20/30/40/50% e 120/240/360/420m + preview idênticos; botão `disabled=!isValid` inalterado |
+| S17-03 | Fatiar `ConteudoEducativo.tsx:286` | Novos `education/conteudo.ts` + `PainelSistema.tsx` (prop `variante`) + `TabelaComparativa.tsx` + `AbasEducacao.tsx` | `PainelSAC`/`PainelPrice` unificados; tabela `critério/SAC/Price` idêntica |
+| S17-04 | Extrair `SimulacaoCard.tsx` | Novo `layout/SimulacaoCard.tsx` (de `App.tsx:32-58`) | Gradiente + badges `SAC/Price` pixel-idênticos; `App` só compõe `Header/Main/Footer` + `lazy` |
+| S17-05 | Fix `TabelaAmortizacao.tsx:17-20` | `results/TabelaAmortizacao.tsx` | Troca `setState` durante render por `useEffect(() => setPaginaAtual(1), [dados])`; teste `45→12` (`TabelaAmortizacao.test.tsx`) continua PASS; sem warning `StrictMode` |
+| S17-06 | Fix `GraficoLinha.tsx` + `InputField` | `results/GraficoLinha.tsx`, `ui/InputField.tsx` | `options` declara dep `rotuloEixoY` ou remove prop morta; `registerChart()` vai para `utils/chart.ts` (Sprint 18 pode completar); `forwardRef` removido (React 19); 4 gráficos renderizam igual |
+| S17-07 | Verificação + screenshots | `calculadora-fi/`, `docs/screenshots/` | `npx vitest run` total PASS + `npm run build` OK + recaptura manual `dev` + fill + screenshot se qualquer pixel mudou (per AGENTS.md) |
+
+### Entregas
+- 8–10 componentes ≤ ~150 linhas; 2 bugfixes sem mudança visual
+
+### Dependências
+- Sprints 14–16 (lógica já pura; fatiamento só move JSX)
+
+---
+
+## Sprint 18 — Higiene de Arquitetura
+
+**Objetivo:** Fechar fronteiras, padronizar imports e elevar lint sem mudar comportamento.
+
+### Tarefas
+
+| ID | Tarefa | Onde | Critério de Aceite |
+|----|--------|------|-------------------|
+| S18-01 | Padronizar barrels | `*/index.ts` | Uma convenção (tudo via barrel OU tudo relativo); `App` e `Comparacao` consistentes; `tsc -b` OK |
+| S18-02 | Split `csv.ts` | Novo `src/utils/csvDownload.ts` | `gerarCSV/Completo` ficam puros; `downloadCSV` (Blob+BOM+`URL`) isolado + teste de falha `createObjectURL`; formato `;`/`,`/`BOM` inalterado (Excel/Sheets) |
+| S18-03 | Centralizar chart | Novo `src/utils/chart.ts` | Cores `SAC #059669/PRICE #2563eb`, `registerChart()`, `tooltip` pt-BR; `GraficoLinha` só consome |
+| S18-04 | Resolver `sharing/` | `sharing/` → `results/` ou documentar | Ou move `WhatsAppShareButton:60` para `results/` ou registra decisão de manter; mensagem WhatsApp inalterada |
+| S18-05 | Limpeza deps/lint | `package.json`, `.oxlintrc.json` | Remove `user-event` se sem uso; ativa gradualmente `no-unused-vars`/`correctness`; `npm run lint` zero errors |
+| S18-06 | Verificação final v1.4 | `calculadora-fi/` | `npm run lint && npm run format:check && npm run build` OK; `dist/` ~464KB (±10%); 53 testes originais + novos todos PASS |
+
+### Entregas
+- Arquitetura final conforme PRD §28.3; `dist/` e testes verdes
+
+### Dependências
+- Sprint 17 (componentes finais estáveis)
+
+---
+
 ## Definição de Pronto (DoD)
 
 Cada Sprint só será considerada completa quando:
@@ -358,6 +498,9 @@ Cada Sprint só será considerada completa quando:
 - [ ] Cross-browser testado (últimas 2 versões)
 - [ ] Code review realizado
 - [x] Documentação atualizada — PRD v1.3, SPRINTS (Sprint 12), README com screenshots em 22/10/2026
+- [ ] Documentação v1.4 — PRD §28 + SPRINTS 13–18 planejados em 22/10/2026, pendente implementação
+
+> DoD específico das Sprints 13–18 (refatoração segura): sem mudança visual/funcional (RFR-001); `npx vitest run` PASS incluindo novos `analise/validacao` testes; `rg 'replace\(/\\./g'` sem ocorrências fora de `format.ts`; `tsc -b && vite build` OK; `npm run lint` zero errors e `format:check` OK.
 
 ---
 
@@ -415,6 +558,12 @@ Sprint 6 (Gráficos)
     │
     ▼
 Sprint 8 (Polish)
+    │
+    ▼
+Sprint 12 (Refinos)
+    │
+    ▼
+Sprint 13 (Trava) → 14 (analise) → 15 (parsing) → 16 (validacao) → 17 (componentes) → 18 (higiene)
 ```
 
 ---
@@ -435,8 +584,14 @@ Sprint 8 (Polish)
 | Sprint 10 | 2 dias | Média-Alta |
 | Sprint 11 | 1-2 dias | Média |
 | Sprint 12 | — (não estimado, executado ad-hoc) | Baixa-Média |
+| Sprint 13 | 0,5 dia | Baixa |
+| Sprint 14 | 1 dia | Média |
+| Sprint 15 | 0,5-1 dia | Média |
+| Sprint 16 | 1 dia | Média |
+| Sprint 17 | 1-2 dias | Média-Alta |
+| Sprint 18 | 1 dia | Baixa-Média |
 
-**Total Estimado:** 14-19 dias de desenvolvimento (Sprints 1-11; Sprint 12 fora do plano original)
+**Total Estimado:** 14-19 dias de desenvolvimento (Sprints 1-11; Sprint 12 fora do plano original) + 5-6,5 dias (Sprints 13–18, refatoração v1.4)
 
 ---
 
@@ -453,5 +608,5 @@ Sprint 8 (Polish)
 
 ---
 
-**Status em 22/10/2026:** Sprints 1-11 implementadas + Sprint 12 (refinos) implementada; pendente commit por escopo, cross-browser formal e code review.  
-**Próximo passo:** (1) commitar por escopo, (2) testes cross-browser, (3) PWA / INCC-TR / PDF-XLSX / ITBI (alinhado ao Roadmap do README).
+**Status em 22/10/2026:** Sprints 1-11 implementadas + Sprint 12 (refinos) implementada; pendente commit por escopo, cross-browser formal e code review. Sprints 13–18 (refatoração v1.4, PRD §28) planejadas, não iniciadas.  
+**Próximo passo:** (1) commitar v1.3 por escopo, (2) executar Sprints 13→18 em ordem (cada uma com `vitest` + `lint` + `build`), (3) testes cross-browser, (4) PWA / INCC-TR / PDF-XLSX / ITBI (alinhado ao Roadmap do README).

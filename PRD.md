@@ -1,8 +1,8 @@
 # PRD — Calculadora de Financiamento Imobiliário
 
-**Versão:** 1.3  
+**Versão:** 1.4 (draft — refatoração planejada)  
 **Data:** 22 de Outubro de 2026  
-**Status:** Implementado e validado  
+**Status:** v1.3 implementado e validado; v1.4 (refatoração interna, sem mudança funcional) planejado  
 
 ---
 
@@ -500,5 +500,80 @@ Onde:
 - [x] Gráficos adicionais (juros, amortização, saldo devedor)
 - [x] Exportação CSV
 - [x] Paginação de tabelas
+- [ ] Plano de refatoração e modularização (v1.4, sem mudança funcional)
 
-**Status do PRD:** v1.3 implementado e validado em 22/10/2026 (53 testes Vitest passando, build limpo, `dist/` 464KB).
+---
+
+## 28. Plano de Refatoração e Modularização (v1.4 — sem mudança funcional)
+
+**Motivador (decisão 22/10/2026):** manutenibilidade. **Escopo:** só refatoração segura — nenhuma mudança visual/comportamental. **Estratégia:** incremental por fases, cada fase reversível e coberta por testes. Detalhamento executável em `SPRINTS.md` (Sprints 13–18).
+
+### 28.1 Diagnóstico (base: auditoria 22/10/2026, ~2.262 linhas sem testes)
+
+| Achado | Onde | Impacto |
+|--------|------|---------|
+| Lógica derivada dentro de UI (sem cobertura) | `ComparacaoFinanciamento.tsx:19-37` (`mesCruzamento`, `%economia`), `ResultadoHeader.tsx:19-25` (`principal`), `FormCalculator.tsx:34-62` (`taxaAnual`, `prazoAnos`, `preview`, `%entrada`) | Baixa testabilidade, risco de divergência |
+| Parsing de moeda/percentual duplicado (6 ocorrências) | `useFormCalculator.ts:37-38,157-158` + `FormCalculator.tsx:29-31` | Drift de formato; gotcha máscara `/100` (`format.ts`) |
+| Validação acoplada a formatação | `useFormCalculator.ts:53` chama `formatarEntradaMoeda()` dentro de `validate()`; `handleChange:104-118` vs `handleBlur:126-142` quase idênticas | Teste frágil, validador não reutilizável |
+| Componentes grandes (>200 linhas) | `ConteudoEducativo.tsx:286`, `ComparacaoFinanciamento.tsx:244`, `FormCalculator.tsx:228` (+ `PainelSAC` vs `PainelPrice` JSX idêntico) | Difícil revisar/testar |
+| Anti-patterns isolados | `TabelaAmortizacao.tsx:17-20` (`setState` durante render), `GraficoLinha.tsx:17-26,90-167` (`ChartJS.register()` em módulo + `options` ignora `rotuloEixoY`), `InputField` com `forwardRef` legado (desnecessário no React 19) | Extra render em `StrictMode`, prop morta |
+| Mistura puro/impuro + over-segmentação | `csv.ts:46` (`downloadCSV` com DOM junto da geração), `sharing/` com 1 arquivo de 60 linhas, barrels inconsistentes | Dificulta mock/teste |
+
+### 28.2 Princípios e restrições globais (valem para Sprints 13–18)
+
+- Fluxo mantido: `components → hooks → utils → types`, sem ciclos. `components` só renderizam; todo cálculo vai para `utils/` puro.
+- Regras de negócio imutáveis: entrada ≥ 20% e < valor (RN-001), taxa 0–20%/mês, prazo 1–600 (RN-002/RN-003), arredondamento 2 casas com ajuste na última parcela (RN-004), CSV pt-BR `;` + `,` + `BOM \uFEFF` + seções `SAC —/Price —`.
+- Load-bearing intocável sem migração dedicada: `vite.config.ts` (`globals:true`, `jsdom`, `setupFiles:./src/test/setup.ts`, `css:true`), máscara `/100`, mensagens pt-BR.
+- Núcleo `calculos.ts` (SAC/Price/Totais/comparar) não muda na refatoração; invariantes travadas: `parcela = amort + juros`, `total - juros = principal`, `SAC.juros < Price.juros`.
+- Comandos de verificação por fase (em `calculadora-fi/`): `npx vitest run <escopo>`, `npm run lint`, `npm run format:check`, `npm run build` (`tsc -b && vite build`).
+
+### 28.3 Arquitetura-alvo (sem mudar UX)
+
+```text
+src/
+  constants/negocio.ts      # ENTRADA_MINIMA=0.2, TAXA_MAXIMA=20, PRAZO_MAXIMO=600, ITENS_POR_PAGINA=20, atalhos
+  utils/
+    format.ts               # + parseMoedaParaNumero(), parsePercentualParaNumero(), formatarPercentual()
+    calculos.ts             # inalterado no núcleo
+    analise.ts              # NOVO puro: mesCruzamento(), percentualEconomia(), valorPrincipal(), taxaAnualEquivalente(), prazoEmAnos(), percentualEntrada()
+    csv.ts                  # só geração pura; downloadCSV → csvDownload.ts (DOM)
+    chart.ts                # NOVO: cores SAC/PRICE + chartOptions() + registerChart()
+  domain/validacao.ts       # NOVO puro: validateFinanciamento(números) sem máscara/formatação
+  components/
+    form/ (container + CamposFormulario + AtalhosEntrada/Prazo + PreviewPrincipal)
+    results/ (Comparacao orquestra + CartaoRecomendacao + GradeGraficos + AbasTabelas)
+    education/ (conteudo.ts + PainelSistema unificado + TabelaComparativa + AbasEducacao)
+    layout/ + SimulaCard.tsx (extraído de App.tsx:32-58)
+```
+
+### 28.4 Fases (resumo; tarefas e DoD em SPRINTS.md)
+
+| Fase | Sprint | Entrega |
+|------|--------|---------|
+| Fase 0 — Trava de segurança | Sprint 13 | Testes de caracterização do comportamento atual (sem código produtivo) |
+| Fase 1 — Derivados puros | Sprint 14 | `utils/analise.ts` + testes; UI consome (remove lógica de `Comparacao/ResultadoHeader/Form`) |
+| Fase 2 — Parsing único | Sprint 15 | `parseMoeda/Percentual` em `format.ts`; substitui 6 ocorrências + `toLocaleString` ad-hoc |
+| Fase 3 — Validação pura | Sprint 16 | `constants/negocio.ts` + `domain/validacao.ts`; hook vira adaptador fino |
+| Fase 4 — Fatiar componentes + 2 bugfixes seguros | Sprint 17 | Sub-componentes + `useEffect` em `Tabela` + `options` do `Grafico` + sem `forwardRef` |
+| Fase 5 — Higiene | Sprint 18 | Barrels consistentes, split `csv`, `chart.ts`, `sharing`, `oxlint`, limpeza `user-event` se morto |
+
+### 28.5 Requisitos de refatoração
+
+| ID | Requisito | Critério de aceite |
+|----|-----------|-------------------|
+| RFR-001 | Nenhuma mudança visual/funcional | Screenshots e fluxos US-001–US-013 inalterados; testes existentes continuam passando sem ajuste de snapshot |
+| RFR-002 | Lógica derivada 100% em funções puras testadas | `mesCruzamento`, `%economia`, `principal`, `taxaAnual`, `prazoAnos`, `preview` cobertos em `analise.test.ts` |
+| RFR-003 | Parsing centralizado | Uma única implementação de parse moeda/percentual; zero ocorrências de `replace(/\./g,'')` fora de `format.ts` |
+| RFR-004 | Validação pura reutilizável | `validateFinanciamento` sem importar `format.ts`; mensagem formatada injetada pelo hook |
+| RFR-005 | Componentes ≤ ~150 linhas cada (alvo) | `Comparacao/Form/Educativo` fatiados; nenhum arquivo novo >150 linhas sem justificativa |
+| RFR-006 | Sem `setState` durante render | `TabelaAmortizacao` usa `useEffect` ou `key`; sem warning em `StrictMode` |
+
+### 28.6 Riscos
+
+| Risco | Mitigação |
+|-------|-----------|
+| Quebrar arredondamento/invariantes | Fase 1 não toca núcleo; caracterização trava totais antes |
+| Mensagem de erro com formato quebra teste | Validador recebe número; hook formata |
+| Canvas `chart.js` quebra `jsdom` | Sem teste de canvas novo; manter `memo/useMemo` |
+
+**Status do PRD:** v1.3 implementado e validado em 22/10/2026 (53 testes Vitest passando, build limpo, `dist/` 464KB). v1.4 (refatoração, §28 + Sprints 13–18) planejado em 22/10/2026, sem mudança funcional.
