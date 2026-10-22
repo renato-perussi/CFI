@@ -206,7 +206,7 @@ Execute dentro de `calculadora-fi/`:
 └── README.md                # Este arquivo
 ```
 
-> Documentos de produto em `PRD.md` (v1.3) e `SPRINTS.md` (Sprints 1-12) — ver `## Documentação`.
+> Documentos de produto em `PRD.md` (v1.5) e `SPRINTS.md` (Sprints 1-22) — ver `## Documentação`.
 
 Fórmulas:
 
@@ -248,8 +248,8 @@ npm run dev  # :5173
 
 ## Documentação
 
-- `PRD.md` v1.3 — visão, personas, FR/NFR (+FR-033 a FR-039 pós-MVP), fórmulas, status implementado e validado em 22/10/2026
-- `SPRINTS.md` — 11 sprints + Sprint 12 (refinos), DoD com evidências de 22/10/2026, pendências (commit, cross-browser, review)
+- `PRD.md` v1.5 — visão, personas, FR/NFR (+FR-033 a FR-039 pós-MVP), fórmulas, refatoração v1.4 (§28) e plano de Dockerização v1.5 (§29, requisitos DKR-001 a DKR-008)
+- `SPRINTS.md` — Sprints 1–18 implementadas (123 testes / 10 arquivos) + Sprints 19–22 (Dockerização multi-stage + Nginx non-root + Docker Compose) planejadas
 - `calculadora-fi/README.md` — README técnico resumido do app
 
 ## Roadmap
@@ -258,6 +258,8 @@ npm run dev  # :5173
 - [x] Sprints 6-7: gráficos + WhatsApp + educativo
 - [x] Sprints 9-11: paginação, +3 gráficos, CSV
 - [x] Sprint 8: SEO, OG tags, acessibilidade, performance
+- [x] Sprints 12-18: refinos pós-MVP + refatoração modular v1.4 (123 testes)
+- [ ] Sprints 19-22: Dockerização multi-stage (`node:22-alpine` + `nginx-unprivileged`) e Docker Compose
 - [ ] PWA / salvar simulações localStorage
 - [ ] Comparar com correção INCC/TR
 - [ ] Exportar PDF/XLSX

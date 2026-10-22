@@ -1,8 +1,8 @@
 # PRD — Calculadora de Financiamento Imobiliário
 
-**Versão:** 1.4 (draft — refatoração planejada)  
+**Versão:** 1.5 (draft — dockerização planejada)  
 **Data:** 22 de Outubro de 2026  
-**Status:** v1.3 implementado e validado; v1.4 (refatoração interna, sem mudança funcional) planejado  
+**Status:** v1.3 e v1.4 (refatoração Sprints 13–18, 123 testes / 10 arquivos) implementados e validados; v1.5 (Dockerização e Orquestração, Sprints 19–22) planejado  
 
 ---
 
@@ -500,13 +500,14 @@ Onde:
 - [x] Gráficos adicionais (juros, amortização, saldo devedor)
 - [x] Exportação CSV
 - [x] Paginação de tabelas
-- [ ] Plano de refatoração e modularização (v1.4, sem mudança funcional)
+- [x] Plano de refatoração e modularização (v1.4, sem mudança funcional)
+- [ ] Plano de Dockerização e Orquestração (v1.5, Sprints 19–22)
 
 ---
 
 ## 28. Plano de Refatoração e Modularização (v1.4 — sem mudança funcional)
 
-**Motivador (decisão 22/10/2026):** manutenibilidade. **Escopo:** só refatoração segura — nenhuma mudança visual/comportamental. **Estratégia:** incremental por fases, cada fase reversível e coberta por testes. Detalhamento executável em `SPRINTS.md` (Sprints 13–18).
+**Motivador (decisão 22/10/2026):** manutenibilidade. **Escopo:** só refatoração segura — nenhuma mudança visual/comportamental. **Estratégia:** incremental por fases, cada fase reversível e coberta por testes. Detalhamento executável em `SPRINTS.md` (Sprints 13–18 — **concluídas**).
 
 ### 28.1 Diagnóstico (base: auditoria 22/10/2026, ~2.262 linhas sem testes)
 
@@ -576,4 +577,77 @@ src/
 | Mensagem de erro com formato quebra teste | Validador recebe número; hook formata |
 | Canvas `chart.js` quebra `jsdom` | Sem teste de canvas novo; manter `memo/useMemo` |
 
-**Status do PRD:** v1.3 implementado e validado em 22/10/2026 (53 testes Vitest passando, build limpo, `dist/` 464KB). v1.4 (refatoração, §28 + Sprints 13–18) planejado em 22/10/2026, sem mudança funcional.
+---
+
+## 29. Plano de Dockerização e Orquestração (v1.5 — Containerização)
+
+**Motivador (decisão 22/10/2026):** portabilidade, reprodutibilidade de ambiente (dev, teste/lint e produção) e deploy padronizado como container imutável. **Escopo:** containerização multi-stage da aplicação frontend em `calculadora-fi/` e orquestração via Docker Compose na raiz do repositório, sem alterar regras de negócio ou interface. Detalhamento executável em `SPRINTS.md` (Sprints 19–22).
+
+### 29.1 Diagnóstico Técnico para Containerização
+
+| Aspecto | Situação no Repositório | Impacto na Dockerização |
+|---------|-------------------------|-------------------------|
+| Topologia de pastas | Raiz contém documentação (`PRD.md`, `SPRINTS.md`, `README.md`, `docs/`); app vive isolado em `calculadora-fi/` | `Dockerfile` e `.dockerignore` ficam em `calculadora-fi/`; `docker-compose.yml` fica na raiz com `context: ./calculadora-fi` |
+| Natureza da aplicação | 100% SPA estática client-side (sem backend, sem banco de dados, sem `import.meta.env` / `process.env`) | Imagem final de produção não precisa de Node.js; apenas Nginx servindo os estáticos de `dist/` (~460 KB) |
+| Requisitos de Node.js | Vite `^8.1.1` e pacotes CSS exigem `node: ^20.19.0 \|\| ^22.12.0 \|\| >=24.0.0` | Uso obrigatório de `node:22-alpine` (LTS) nos estágios de build, dev e check |
+| Binários nativos (Rust) | `rolldown` (Vite 8), `@tailwindcss/oxide`, `lightningcss` e `oxlint` usam bindings nativos | `package-lock.json` já inclui `optionalDependencies` para `linux-*-musl`; `npm ci` dentro do container Alpine instala os binários corretos |
+| Artefatos locais existentes | `calculadora-fi/node_modules/` e `calculadora-fi/dist/` existem no disco local | Obrigatório `.dockerignore` rigoroso para não vazar binários `glibc` do host nem invalidar o cache de camadas do Docker |
+| Rede no modo Dev (HMR) | `vite` por padrão escuta apenas em `127.0.0.1:5173` | No container `dev`, é necessário passar `--host 0.0.0.0` para permitir acesso via port-forwarding |
+
+### 29.2 Decisões Arquiteturais (ADRs)
+
+1. **ADR-01 — Imagem Base de Build (`node:22-alpine`):** Atende com folga o requisito de engine do Vite 8 (`^22.12.0`), reduz drasticamente o tamanho das camadas intermediárias e é compatível com os pacotes `-musl` já mapeados no `package-lock.json`.
+2. **ADR-02 — Servidor de Produção (`nginxinc/nginx-unprivileged:stable-alpine`):** Substitui `vite preview` (não recomendado para produção) por um servidor Nginx oficial que roda sem privilégios de `root` (UID `101`, porta interna `8080`), gerando uma imagem final enxuta (~40–50 MB) e segura.
+3. **ADR-03 — Porta Padrão Parametrizável (`${PORT:-8080}:8080`):** Expõe por padrão em `http://localhost:8080` (evitando conflito com portas privilegiadas `<1024`, `5173` do Vite dev e `3000`), permitindo sobrescrita imediata via variável de ambiente (`PORT=3000 docker compose up -d`).
+4. **ADR-04 — Estágio de Qualidade (`check`) Desacoplado do `builder`:** O comando `npm run build` já executa `tsc -b && vite build` (garantindo checagem estrita de tipos no build de produção). O estágio `check` (OxLint + Prettier + 123 testes Vitest/jsdom) fica disponível no mesmo `Dockerfile` herdando o cache de `base`, podendo ser executado sob demanda ou em CI (`docker compose --profile test run --rm test`) sem penalizar o tempo de build de produção.
+5. **ADR-05 — Orquestração na Raiz (`docker-compose.yml`):** Posicionado na raiz do projeto apontando para `./calculadora-fi`, permitindo subir produção (`app`), desenvolvimento com HMR (`dev`) ou suíte de testes (`test`) diretamente da raiz do repositório.
+
+### 29.3 Arquitetura Multi-Stage e Estrutura de Arquivos
+
+```text
+[base: node:22-alpine] (WORKDIR /app + package*.json + npm ci com cache de camada)
+   ├──► [dev]     → CMD: npm run dev -- --host 0.0.0.0 (porta 5173, HMR via bind mounts)
+   ├──► [check]   → CMD: npm run lint && npm run format:check && npm run test (123 testes)
+   └──► [builder] → RUN: npm run build (tsc -b && vite build → gera /app/dist)
+           │
+           ▼
+[prod: nginxinc/nginx-unprivileged:stable-alpine]
+   └── Copia nginx.conf + /app/dist → /usr/share/nginx/html (non-root, porta 8080, HEALTHCHECK)
+```
+
+**Arquivos do escopo v1.5:**
+
+```text
+.
+├── docker-compose.yml               # NOVO: Serviços app (prod), dev (profile dev) e test (profile test)
+├── README.md                        # MODIFICADO: Instruções de execução com Docker
+└── calculadora-fi/
+    ├── .dockerignore                # NOVO: Exclui node_modules, dist, coverage, logs, .git, IDEs
+    ├── Dockerfile                   # NOVO: Multi-stage (base, dev, check, builder, prod)
+    ├── nginx.conf                   # NOVO: SPA fallback, cache imutável /assets/, gzip, security headers
+    └── README.md                    # MODIFICADO: Comandos Docker resumidos
+```
+
+### 29.4 Requisitos de Containerização
+
+| ID | Requisito | Prioridade | Critério de Aceite |
+|----|-----------|------------|-------------------|
+| DKR-001 | Higiene de contexto Docker | Must | `.dockerignore` impede envio de `node_modules/`, `dist/`, `coverage/`, `.git/` e logs ao daemon |
+| DKR-002 | Stage `base` com cache de dependências | Must | `node:22-alpine` executa `npm ci` copiando apenas `package.json` e `package-lock.json` antes do código-fonte |
+| DKR-003 | Stage `dev` com HMR em container | Should | `npm run dev -- --host 0.0.0.0` acessível em `http://localhost:5173` com recarregamento ao editar `src/` |
+| DKR-004 | Stage `check` isolado para qualidade | Should | Executa `npm run lint && npm run format:check && npm run test` (123 testes passando em container) |
+| DKR-005 | Stage `builder` de produção | Must | Executa `npm run build` (`tsc -b && vite build`) gerando `/app/dist` sem erros |
+| DKR-006 | Stage `prod` seguro e otimizado | Must | `nginxinc/nginx-unprivileged:stable-alpine` na porta `8080`, non-root, `gzip on`, cache `1y immutable` para `/assets/`, `no-cache` para `/index.html`, headers de segurança (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `server_tokens off`) e `HEALTHCHECK` funcional |
+| DKR-007 | Orquestração via Docker Compose | Must | `docker-compose.yml` na raiz com serviço padrão `app` (`${PORT:-8080}:8080`) e perfis `dev` e `test` |
+| DKR-008 | Documentação atualizada | Must | `README.md`, `calculadora-fi/README.md` e `AGENTS.md` documentam os fluxos Docker |
+
+### 29.5 Riscos e Mitigações (Dockerização)
+
+| Risco | Impacto | Probabilidade | Mitigação |
+|-------|---------|---------------|-----------|
+| Vazamento de `node_modules` do host (glibc) para o container (musl) | Alto (falha nos bindings Rust `rolldown`/`oxide`/`oxlint`) | Média | `.dockerignore` bloqueia `node_modules` no build; volume anônimo `/app/node_modules` ou bind seletivo de `./calculadora-fi/src` no Compose `dev` |
+| Cache de navegador retendo `index.html` antigo após novo deploy | Médio (usuário tenta baixar chunks JS com hash antigo) | Média | `nginx.conf` define `Cache-Control: no-cache` para `/index.html` e `public, max-age=31536000, immutable` apenas para `/assets/` |
+| Permissão negada ao rodar Nginx como usuário non-root | Alto (container não inicia se tentar usar porta 80 ou `/var/cache/nginx` restrito) | Baixa | Uso da imagem oficial `nginxinc/nginx-unprivileged:stable-alpine` pré-configurada para UID `101` e porta `8080` |
+| Vite Dev Server inacessível fora do container | Médio (`Connection reset` no host) | Alta (se omitido flag) | Passar `--host 0.0.0.0` explicitamente no `CMD` do stage `dev` |
+
+**Status do PRD:** v1.3 implementado e validado; v1.4 (refatoração, §28 + Sprints 13–18) implementado e validado (123 testes Vitest passando em 10 arquivos, OxLint e Prettier limpos, build `dist/` ~460KB). v1.5 (Dockerização, §29 + Sprints 19–22) planejado em 22/10/2026.

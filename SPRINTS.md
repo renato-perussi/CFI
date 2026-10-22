@@ -1,10 +1,11 @@
 # Sprints — Calculadora de Financiamento Imobiliário
 
 **Projeto:** Calculadora de Financiamento Imobiliário  
-**Base:** PRD v1.3 (implementado e validado em 22/10/2026) + PRD §28 / v1.4-draft (refatoração planejada em 22/10/2026, sem mudança funcional)  
+**Base:** PRD v1.3 + v1.4 (implementados e validados em 22/10/2026) + PRD §29 / v1.5-draft (Dockerização e Orquestração planejadas em 22/10/2026)  
 **Metodologia:** Sprints iterativas com entregas incrementais  
 **Stack Frontend:** React 19 + TypeScript ~6.0 + Tailwind CSS 4.3 + Vite 8.1 (Chart.js 4.5, Vitest 5.0, OxLint 1.71)  
-**Status em 22/10/2026:** Sprints 1-11 implementadas + Sprint 12 (refinos) implementada (53 testes passando, build limpo, `dist/` 464KB). Git: 1 commit + 31 arquivos modificados não commitados — pendente commit por escopo. Sprints 13–18 (refatoração v1.4) planejadas, não iniciadas.
+**Stack Infra/Containers (v1.5):** Docker Multi-Stage (`node:22-alpine` + `nginxinc/nginx-unprivileged:stable-alpine`) + Docker Compose  
+**Status em 22/10/2026:** Sprints 1–18 implementadas e commitadas (123 testes passando em 10 arquivos, OxLint/Prettier limpos, `dist/` ~460KB). Sprints 19–22 (Dockerização v1.5) planejadas, prontas para implementação.
 
 ---
 
@@ -30,6 +31,10 @@
 | Sprint 16 | v1.4-refator | Validação pura | `constants/business.ts` + `domain/validation.ts`; hook fino |
 | Sprint 17 | v1.4-refator | Fatiar componentes + bugfixes seguros | Sub-componentes; `Tabela`/`Grafico`/`InputField` |
 | Sprint 18 | v1.4-refator | Higiene de arquitetura | Barrels, split `csv`, `chart.ts`, `sharing`, lint |
+| Sprint 19 | v1.5-docker | Contexto e Servidor Web | `calculadora-fi/.dockerignore` + `calculadora-fi/nginx.conf` (SPA, cache, gzip, security headers) |
+| Sprint 20 | v1.5-docker | Dockerfile Multi-Stage | `calculadora-fi/Dockerfile` com stages `base`, `dev`, `check`, `builder` e `prod` (non-root `8080`) |
+| Sprint 21 | v1.5-docker | Orquestração Compose | `docker-compose.yml` na raiz com serviços `app` (`${PORT:-8080}:8080`), `dev` (HMR) e `test` (check) |
+| Sprint 22 | v1.5-docker | Validação E2E e Docs | Smoke tests de containers (`prod`, `dev`, `test`), headers HTTP, healthcheck e atualização de `README.md`/`AGENTS.md` |
 
 ---
 
@@ -487,20 +492,114 @@
 
 ---
 
+## Sprint 19 — Contexto Docker e Servidor Web (`nginx.conf` + `.dockerignore`)
+
+**Objetivo:** Isolar o contexto de build do Docker e configurar o servidor Nginx para servir a SPA estática com alta performance e segurança (DKR-001, DKR-006).
+
+### Tarefas
+
+| ID | Tarefa | Onde | Critério de Aceite |
+|----|--------|------|-------------------|
+| S19-01 | Criar `.dockerignore` | `calculadora-fi/.dockerignore` | Exclui `node_modules/`, `dist/`, `dist-ssr/`, `coverage/`, `*.log`, `.git/`, `.vscode/`, `.idea/` e `.env*` |
+| S19-02 | Configurar servidor SPA na porta `8080` | `calculadora-fi/nginx.conf` | `listen 8080;`, `root /usr/share/nginx/html;`, `index index.html;` e `try_files $uri $uri/ /index.html;` |
+| S19-03 | Configurar compressão Gzip | `calculadora-fi/nginx.conf` | `gzip on; gzip_vary on; gzip_min_length 1024;` cobrindo `text/plain`, `text/css`, `application/javascript`, `application/json`, `image/svg+xml` |
+| S19-04 | Configurar política de cache HTTP | `calculadora-fi/nginx.conf` | `/assets/` com `expires 1y; add_header Cache-Control "public, immutable";` e `/index.html`, `/favicon.svg`, `/og-image.svg` com `add_header Cache-Control "no-cache";` |
+| S19-05 | Configurar headers de segurança HTTP | `calculadora-fi/nginx.conf` | `server_tokens off;`, `X-Content-Type-Options "nosniff"`, `X-Frame-Options "SAMEORIGIN"`, `Referrer-Policy "strict-origin-when-cross-origin"` |
+
+### Entregas
+- `calculadora-fi/.dockerignore` enxuto e seguro
+- `calculadora-fi/nginx.conf` otimizado para Vite SPA + Nginx non-root (`8080`)
+
+### Dependências
+- Sprint 18 (estrutura de build estática consolidada)
+
+---
+
+## Sprint 20 — Dockerfile Multi-Stage (`base`, `dev`, `check`, `builder`, `prod`)
+
+**Objetivo:** Construir um `Dockerfile` multi-stage em `calculadora-fi/` que atenda desenvolvimento, verificação de qualidade e produção enxuta sem privilégios de `root` (DKR-002 a DKR-006).
+
+### Tarefas
+
+| ID | Tarefa | Onde | Critério de Aceite |
+|----|--------|------|-------------------|
+| S20-01 | Implementar stage `base` | `calculadora-fi/Dockerfile` | Usa `node:22-alpine`, define `WORKDIR /app`, copia `package.json` + `package-lock.json` e executa `npm ci` com cache de camada |
+| S20-02 | Implementar stage `dev` | `calculadora-fi/Dockerfile` | Herda de `base`, copia código-fonte, `EXPOSE 5173` e define `CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]` |
+| S20-03 | Implementar stage `check` | `calculadora-fi/Dockerfile` | Herda de `base`, copia arquivos do projeto e define `CMD ["sh", "-c", "npm run lint && npm run format:check && npm run test"]` |
+| S20-04 | Implementar stage `builder` | `calculadora-fi/Dockerfile` | Herda de `base`, copia código-fonte e executa `RUN npm run build` (`tsc -b && vite build`), gerando `/app/dist` |
+| S20-05 | Implementar stage `prod` | `calculadora-fi/Dockerfile` | Usa `nginxinc/nginx-unprivileged:stable-alpine`, copia `nginx.conf` para `/etc/nginx/conf.d/default.conf`, copia `--from=builder /app/dist /usr/share/nginx/html`, `EXPOSE 8080` e define `HEALTHCHECK` via `wget -q --spider http://127.0.0.1:8080/ \|\| exit 1` |
+
+### Entregas
+- `calculadora-fi/Dockerfile` completo com 5 estágios modulares
+
+### Dependências
+- Sprint 19 (`.dockerignore` e `nginx.conf` prontos)
+
+---
+
+## Sprint 21 — Orquestração com Docker Compose (`app`, `dev`, `test`)
+
+**Objetivo:** Permitir subir o ambiente de produção, desenvolvimento com HMR ou a suíte de testes diretamente da raiz do repositório com um único comando (DKR-007).
+
+### Tarefas
+
+| ID | Tarefa | Onde | Critério de Aceite |
+|----|--------|------|-------------------|
+| S21-01 | Criar `docker-compose.yml` na raiz | `docker-compose.yml` | Contexto de build apontando para `./calculadora-fi` |
+| S21-02 | Configurar serviço `app` (produção padrão) | `docker-compose.yml` | `target: prod`, mapeamento `"${PORT:-8080}:8080"`, `restart: unless-stopped`, healthcheck ativo |
+| S21-03 | Configurar serviço `dev` (profile `dev`) | `docker-compose.yml` | `profiles: ["dev"]`, `target: dev`, porta `"${DEV_PORT:-5173}:5173"`, bind mounts de `./calculadora-fi/src:/app/src`, `./calculadora-fi/public:/app/public`, `./calculadora-fi/index.html:/app/index.html` preservando `/app/node_modules` do container |
+| S21-04 | Configurar serviço `test` (profile `test`) | `docker-compose.yml` | `profiles: ["test"]`, `target: check` para rodar OxLint + Prettier + Vitest sob demanda |
+
+### Entregas
+- `docker-compose.yml` na raiz do repositório com suporte a `PORT` customizável e profiles `dev`/`test`
+
+### Dependências
+- Sprint 20 (`Dockerfile` multi-stage concluído)
+
+---
+
+## Sprint 22 — Validação End-to-End de Containers e Documentação
+
+**Objetivo:** Verificar todos os estágios e serviços Docker em execução real e atualizar a documentação do projeto (DKR-008).
+
+### Tarefas
+
+| ID | Tarefa | Onde | Critério de Aceite |
+|----|--------|------|-------------------|
+| S22-01 | Validar suíte de qualidade em container (`test`) | Terminal / Docker | `docker compose --profile test run --rm test` executa OxLint, Prettier (`format:check`) e Vitest (123/123 testes passando) com exit code `0` |
+| S22-02 | Validar imagem e container de produção (`app`) | Terminal / Docker | `docker compose up -d --build app` sobe container `healthy`; imagem final `< 60MB`; `curl -I http://localhost:8080` retorna `200 OK` com headers de segurança, `Cache-Control: no-cache` no HTML e `immutable` nos assets `/assets/*.js` |
+| S22-03 | Validar container de desenvolvimento (`dev`) | Terminal / Docker | `docker compose --profile dev up -d --build dev` responde `200 OK` em `http://localhost:5173` servindo a aplicação via Vite HMR |
+| S22-04 | Atualizar documentação do projeto | `README.md`, `calculadora-fi/README.md`, `AGENTS.md` | Comandos de execução via Docker (produção, porta customizada, dev HMR e testes) documentados de forma clara |
+
+### Entregas
+- Ambientes `prod`, `dev` e `test` validados ponta a ponta
+- Documentação atualizada em `README.md`, `calculadora-fi/README.md` e `AGENTS.md`
+
+### Dependências
+- Sprint 21 (`docker-compose.yml` configurado)
+
+---
+
 ## Definição de Pronto (DoD)
 
 Cada Sprint só será considerada completa quando:
 
-- [x] Código implementado (22/10/2026 — porém **não commitado**: 31 modificados + 5 untracked)
-- [x] Testes unitários passando — 53/53 Vitest em 22/10/2026
-- [x] Build de produção sem erros — `tsc -b && vite build` OK, `dist/` 464KB em 22/10/2026
+- [x] Código implementado e commitado (Sprints 1–18 concluídas em 22/10/2026)
+- [x] Testes unitários passando — 123/123 Vitest (10 arquivos) em 22/10/2026
+- [x] Build de produção sem erros — `tsc -b && vite build` OK, `dist/` ~460KB em 22/10/2026
 - [x] Responsividade validada — mobile-first, validado em 390px em 22/10/2026 (faixa total 320–2560 não medida formalmente)
 - [ ] Cross-browser testado (últimas 2 versões)
 - [ ] Code review realizado
-- [x] Documentação atualizada — PRD v1.3, SPRINTS (Sprint 12), README com screenshots em 22/10/2026
-- [ ] Documentação v1.4 — PRD §28 + SPRINTS 13–18 planejados em 22/10/2026, pendente implementação
+- [x] Documentação atualizada — PRD v1.3 + v1.4, SPRINTS (Sprints 1–18), README com screenshots em 22/10/2026
+- [ ] Dockerização v1.5 — PRD §29 + SPRINTS 19–22 planejados em 22/10/2026, pendente implementação
 
-> DoD específico das Sprints 13–18 (refatoração segura): sem mudança visual/funcional (RFR-001); `npx vitest run` PASS incluindo novos `analise/validacao` testes; `rg 'replace\(/\\./g'` sem ocorrências fora de `format.ts`; `tsc -b && vite build` OK; `npm run lint` zero errors e `format:check` OK.
+> DoD específico das Sprints 13–18 (refatoração segura — **concluído**): sem mudança visual/funcional (RFR-001); `npx vitest run` PASS (123 testes / 10 arquivos); `rg 'replace\(/\\./g'` sem ocorrências fora de `format.ts`; `tsc -b && vite build` OK; `npm run lint` zero errors e `format:check` OK.
+
+> DoD específico das Sprints 19–22 (Dockerização v1.5):
+> 1. `docker compose --profile test run --rm test` passa `lint`, `format:check` e `test` (123 testes);
+> 2. `docker compose up -d --build app` inicia sem `root` na porta `${PORT:-8080}`, atinge status `healthy` e serve `index.html` + chunks lazy (`results`, `education`) com `gzip` e headers de cache/segurança;
+> 3. `docker compose --profile dev up -d --build dev` serve Vite com HMR em `http://localhost:5173`;
+> 4. `README.md`, `calculadora-fi/README.md` e `AGENTS.md` documentam os comandos Docker.
 
 ---
 
@@ -564,6 +663,9 @@ Sprint 12 (Refinos)
     │
     ▼
 Sprint 13 (Trava) → 14 (analise) → 15 (parsing) → 16 (validacao) → 17 (componentes) → 18 (higiene)
+    │
+    ▼
+Sprint 19 (.dockerignore + nginx.conf) → 20 (Dockerfile Multi-Stage) → 21 (Docker Compose) → 22 (Validação E2E + Docs)
 ```
 
 ---
@@ -590,8 +692,12 @@ Sprint 13 (Trava) → 14 (analise) → 15 (parsing) → 16 (validacao) → 17 (c
 | Sprint 16 | 1 dia | Média |
 | Sprint 17 | 1-2 dias | Média-Alta |
 | Sprint 18 | 1 dia | Baixa-Média |
+| Sprint 19 | 0,5 dia | Baixa |
+| Sprint 20 | 0,5-1 dia | Média |
+| Sprint 21 | 0,5 dia | Baixa-Média |
+| Sprint 22 | 0,5 dia | Baixa |
 
-**Total Estimado:** 14-19 dias de desenvolvimento (Sprints 1-11; Sprint 12 fora do plano original) + 5-6,5 dias (Sprints 13–18, refatoração v1.4)
+**Total Estimado:** 14-19 dias (Sprints 1-11) + 5-6,5 dias (Sprints 13–18, refatoração v1.4) + 2-2,5 dias (Sprints 19–22, Dockerização v1.5)
 
 ---
 
@@ -600,7 +706,7 @@ Sprint 13 (Trava) → 14 (analise) → 15 (parsing) → 16 (validacao) → 17 (c
 | ID | Critério |
 |----|----------|
 | CA-G01 | Código TypeScript sem erros de tipo |
-| CA-G02 | ESLint sem warnings/errors |
+| CA-G02 | ESLint/OxLint sem warnings/errors |
 | CA-G03 | Build de produção funciona |
 | CA-G04 | Responsivo em mobile (320px minimum) |
 | CA-G05 | Acessibilidade básica (labels, contraste) |
@@ -608,5 +714,5 @@ Sprint 13 (Trava) → 14 (analise) → 15 (parsing) → 16 (validacao) → 17 (c
 
 ---
 
-**Status em 22/10/2026:** Sprints 1-11 implementadas + Sprint 12 (refinos) implementada; pendente commit por escopo, cross-browser formal e code review. Sprints 13–18 (refatoração v1.4, PRD §28) planejadas, não iniciadas.  
-**Próximo passo:** (1) commitar v1.3 por escopo, (2) executar Sprints 13→18 em ordem (cada uma com `vitest` + `lint` + `build`), (3) testes cross-browser, (4) PWA / INCC-TR / PDF-XLSX / ITBI (alinhado ao Roadmap do README).
+**Status em 22/10/2026:** Sprints 1–18 implementadas e validadas (123 testes passando em 10 arquivos, `dist/` ~460KB). Sprints 19–22 (Dockerização v1.5, PRD §29) planejadas, não iniciadas.  
+**Próximo passo:** (1) executar Sprints 19→22 em ordem (`.dockerignore` + `nginx.conf` → `Dockerfile` → `docker-compose.yml` → validação E2E e docs), (2) testes cross-browser, (3) PWA / INCC-TR / PDF-XLSX / ITBI (alinhado ao Roadmap do README).
