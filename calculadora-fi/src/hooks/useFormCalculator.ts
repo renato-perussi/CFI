@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
-import type { Financiamento } from '../types/financiamento';
+import type { Financiamento } from '../types/financing';
 import {
   formatarEntradaMoeda,
   formatarEntradaPercentual,
@@ -7,8 +7,8 @@ import {
   parseMoedaParaNumero,
   parsePercentualParaNumero,
 } from '../utils/format';
-import { ENTRADA_MINIMA } from '../constants/negocio';
-import { validateFinanciamento, type ErrosFinanciamento } from '../domain/validacao';
+import { ENTRADA_MINIMA } from '../constants/business';
+import { validateFinanciamento, type ErrosFinanciamento } from '../domain/validation';
 
 /** Mesma forma de `ErrosFinanciamento` (domínio); mantido o nome usado pela UI. */
 export type FormErrors = ErrosFinanciamento;

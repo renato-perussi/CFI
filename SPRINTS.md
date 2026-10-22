@@ -25,9 +25,9 @@
 | Sprint 11 | MVP | Exportação CSV | Botão exportar, geração de arquivo CSV |
 | Sprint 12 | v1.3 | Refinos pós-MVP (não planejado) | Ponto de equilíbrio, % economia, taxa anual, atalhos, preview financiado, donut, lazy/FadeIn |
 | Sprint 13 | v1.4-refator | Trava de segurança | Testes de caracterização, sem código produtivo |
-| Sprint 14 | v1.4-refator | Derivados puros | `utils/analise.ts` + testes; UI consome |
+| Sprint 14 | v1.4-refator | Derivados puros | `utils/analysis.ts` + testes; UI consome |
 | Sprint 15 | v1.4-refator | Parsing único | `parseMoeda/Percentual` central; remove 6 duplicações |
-| Sprint 16 | v1.4-refator | Validação pura | `constants/negocio.ts` + `domain/validacao.ts`; hook fino |
+| Sprint 16 | v1.4-refator | Validação pura | `constants/business.ts` + `domain/validation.ts`; hook fino |
 | Sprint 17 | v1.4-refator | Fatiar componentes + bugfixes seguros | Sub-componentes; `Tabela`/`Grafico`/`InputField` |
 | Sprint 18 | v1.4-refator | Higiene de arquitetura | Barrels, split `csv`, `chart.ts`, `sharing`, lint |
 
@@ -336,12 +336,12 @@
 
 | ID | Tarefa | Onde | Critério de Aceite |
 |----|--------|------|-------------------|
-| S12-01 | Ponto de equilíbrio SAC vs Price | `ComparacaoFinanciamento.tsx` (`mesCruzamento`) | Exibe "a partir do NNNº mês" |
-| S12-02 | Percentual de economia | `ComparacaoFinanciamento.tsx` (`percentualEconomia`) | Exibe `-X,X%` |
+| S12-01 | Ponto de equilíbrio SAC vs Price | `FinancingComparison.tsx` (`mesCruzamento`) | Exibe "a partir do NNNº mês" |
+| S12-02 | Percentual de economia | `FinancingComparison.tsx` (`percentualEconomia`) | Exibe `-X,X%` |
 | S12-03 | Taxa anual equivalente | `FormCalculator.tsx` | Exibe `≈ X,XX% a.a.` |
 | S12-04 | Atalhos entrada/prazo | `FormCalculator.tsx` | Botões preenchem campo |
 | S12-05 | Preview valor financiado | `FormCalculator.tsx` | Exibe principal + % antes de calcular |
-| S12-06 | Donut composição amortização/juros | `ResultadoHeader.tsx` | Texto/gráfico por sistema |
+| S12-06 | Donut composição amortização/juros | `ResultHeader.tsx` | Texto/gráfico por sistema |
 | S12-07 | Lazy loading + FadeIn | `App.tsx`, `ui/FadeIn.tsx` | `lazy`+`Suspense` em Comparação/Educativo |
 
 ### Entregas
@@ -361,8 +361,8 @@
 
 | ID | Tarefa | Critério de Aceite |
 |----|--------|-------------------|
-| S13-01 | Criar `src/utils/__tests__/analise.test.ts` com casos de caracterização | Cobre `mesCruzamento` (SAC cruza Price, nunca cruza → `null`, `economia=0`), `%economia` (formato `X,X%`), `principal`, `taxaAnual`, `prazoAnos`, `preview` (regra 20%) |
-| S13-02 | Criar `src/domain/__tests__/validacao.test.ts` vazio ou com casos atuais | Espelha mensagens pt-BR atuais (entrada mínima, taxa >20, prazo >600) como baseline |
+| S13-01 | Criar `src/utils/__tests__/analysis.test.ts` com casos de caracterização | Cobre `mesCruzamento` (SAC cruza Price, nunca cruza → `null`, `economia=0`), `%economia` (formato `X,X%`), `principal`, `taxaAnual`, `prazoAnos`, `preview` (regra 20%) |
+| S13-02 | Criar `src/domain/__tests__/validation.test.ts` vazio ou com casos atuais | Espelha mensagens pt-BR atuais (entrada mínima, taxa >20, prazo >600) como baseline |
 | S13-03 | Rodar baseline | `npx vitest run` com 53 testes existentes PASS; novos testes FAIL (funções ainda não existem) — documentar saída |
 
 ### Entregas
@@ -374,22 +374,22 @@
 
 ---
 
-## Sprint 14 — Derivados Puros (`utils/analise.ts`)
+## Sprint 14 — Derivados Puros (`utils/analysis.ts`)
 
-**Objetivo:** Remover toda lógica derivada de UI para funções puras testadas (RFR-002). Núcleo `calculos.ts` intocado.
+**Objetivo:** Remover toda lógica derivada de UI para funções puras testadas (RFR-002). Núcleo `calculations.ts` intocado.
 
 ### Tarefas
 
 | ID | Tarefa | Onde | Critério de Aceite |
 |----|--------|------|-------------------|
-| S14-01 | Criar `src/utils/analise.ts`: `calcularMesCruzamento(tabelaSAC, tabelaPrice): number \| null` | Novo | Scan linear extraído de `ComparacaoFinanciamento.tsx:19-28`, sem `useMemo` |
+| S14-01 | Criar `src/utils/analysis.ts`: `calcularMesCruzamento(tabelaSAC, tabelaPrice): number \| null` | Novo | Scan linear extraído de `FinancingComparison.tsx:19-28`, sem `useMemo` |
 | S14-02 | `calcularPercentualEconomia(economia, maiorTotal): string` + `calcularValorPrincipal(totalPago, totalJuros): number` | Novo | Substitui `Comparacao:30-37` e `ResultadoHeader:19-25`; formato `pt-BR 1 casa` via `format.ts` |
 | S14-03 | `calcularTaxaAnualEquivalente(taxaMensal)`, `formatarPrazoEmAnos(prazo)`, `calcularPercentualEntrada()`, `calcularValorFinanciadoPreview()` | Novo | Extraídos de `FormCalculator.tsx:34-62`; recebem números, não strings mascaradas |
-| S14-04 | Refatorar consumidores | `ComparacaoFinanciamento.tsx`, `ResultadoHeader.tsx`, `FormCalculator.tsx` | UI só chama `analise.ts`; S13-01 fica verde sem alterar snapshots |
-| S14-05 | Verificação | `calculadora-fi/` | `npx vitest run src/utils/__tests__/analise.test.ts` PASS + `npm run build` OK |
+| S14-04 | Refatorar consumidores | `FinancingComparison.tsx`, `ResultHeader.tsx`, `FormCalculator.tsx` | UI só chama `analysis.ts`; S13-01 fica verde sem alterar snapshots |
+| S14-05 | Verificação | `calculadora-fi/` | `npx vitest run src/utils/__tests__/analysis.test.ts` PASS + `npm run build` OK |
 
 ### Entregas
-- `analise.ts` + testes verdes; 3 componentes sem `Math.pow/toLocaleString/scan` inline
+- `analysis.ts` + testes verdes; 3 componentes sem `Math.pow/toLocaleString/scan` inline
 
 ### Dependências
 - Sprint 13 (testes vermelhos)
@@ -406,7 +406,7 @@
 |----|--------|------|-------------------|
 | S15-01 | Adicionar `parseMoedaParaNumero(str): number`, `parsePercentualParaNumero(str): number`, `formatarPercentual(valor, casas=1): string` | `src/utils/format.ts` | Inversas exatas da máscara `/100`; `''` → `0`/`NaN` documentado |
 | S15-02 | Substituir parsing manual | `useFormCalculator.ts:37-38,157-158`, `FormCalculator.tsx:29-31` | Zero ocorrências de `replace(/\./g,'')` fora de `format.ts` (`rg` comprova) |
-| S15-03 | Substituir `toLocaleString` ad-hoc | `FormCalculator.tsx:36,44`, `ComparacaoFinanciamento.tsx:33` | Tudo via `format.ts`/`analise.ts` |
+| S15-03 | Substituir `toLocaleString` ad-hoc | `FormCalculator.tsx:36,44`, `FinancingComparison.tsx:33` | Tudo via `format.ts`/`analysis.ts` |
 | S15-04 | Estender testes | `src/utils/__tests__/format.test.ts` | Casos `30000000→300.000,00`, `085→0,85`, `''`, `0,00`, round-trip máscara→parse |
 | S15-05 | Verificação | `calculadora-fi/` | `npx vitest run src/utils/__tests__/format.test.ts src/hooks/__tests__/useFormCalculator.test.ts src/components/form/__tests__/FormCalculator.test.tsx` PASS |
 
@@ -414,11 +414,11 @@
 - Parsing único + testes; `grep` sem duplicação residual
 
 ### Dependências
-- Sprint 14 (assinaturas de `analise.ts` estáveis)
+- Sprint 14 (assinaturas de `analysis.ts` estáveis)
 
 ---
 
-## Sprint 16 — Validação Pura (`domain/validacao.ts`)
+## Sprint 16 — Validação Pura (`domain/validation.ts`)
 
 **Objetivo:** Desacoplar regra de negócio de máscara/UI (RFR-004).
 
@@ -426,10 +426,10 @@
 
 | ID | Tarefa | Onde | Critério de Aceite |
 |----|--------|------|-------------------|
-| S16-01 | Criar `src/constants/negocio.ts` | Novo | `ENTRADA_MINIMA=0.2, TAXA_MAXIMA=20, PRAZO_MAXIMO=600, ITENS_POR_PAGINA=20` + `ENTRADAS_SUGERIDAS/PRAZOS_SUGERIDOS` (movidos de `FormCalculator`) |
-| S16-02 | Criar `src/domain/validacao.ts`: `validateFinanciamento({valorImovel, entrada, taxaJuros, prazoMeses}: numbers, minimoFormatado?: string)` | Novo | Puro, sem importar `format.ts`; mensagens pt-BR idênticas às atuais |
+| S16-01 | Criar `src/constants/business.ts` | Novo | `ENTRADA_MINIMA=0.2, TAXA_MAXIMA=20, PRAZO_MAXIMO=600, ITENS_POR_PAGINA=20` + `ENTRADAS_SUGERIDAS/PRAZOS_SUGERIDOS` (movidos de `FormCalculator`) |
+| S16-02 | Criar `src/domain/validation.ts`: `validateFinanciamento({valorImovel, entrada, taxaJuros, prazoMeses}: numbers, minimoFormatado?: string)` | Novo | Puro, sem importar `format.ts`; mensagens pt-BR idênticas às atuais |
 | S16-03 | Afinar `useFormCalculator` | `src/hooks/useFormCalculator.ts` | Vira adaptador: parse (`format.ts`) → valida (`domain`) → formata mensagem; unifica `handleChange/handleBlur` via helper `revalidarCruzada()`; elimina `formatarEntradaMoeda()` de dentro de `validate()` |
-| S16-04 | Cobrir bordas | `src/domain/__tests__/validacao.test.ts`, `src/hooks/__tests__/useFormCalculator.test.ts` | `entrada>=valor`, `prazo>600/<=0`, `valor<=0`, revalidação cruzada `valorImovel→entrada` |
+| S16-04 | Cobrir bordas | `src/domain/__tests__/validation.test.ts`, `src/hooks/__tests__/useFormCalculator.test.ts` | `entrada>=valor`, `prazo>600/<=0`, `valor<=0`, revalidação cruzada `valorImovel→entrada` |
 | S16-05 | Verificação | `calculadora-fi/` | `npx vitest run src/domain src/hooks` PASS; mensagens inalteradas |
 
 ### Entregas
@@ -448,12 +448,12 @@
 
 | ID | Tarefa | Onde | Critério de Aceite |
 |----|--------|------|-------------------|
-| S17-01 | Fatiar `ComparacaoFinanciamento.tsx:244` | Novos `results/CartaoRecomendacao.tsx` + `GradeGraficos.tsx` + `AbasTabelas.tsx` | Orquestrador ~60 linhas; tabs `SAC/PRICE` + `BotaoExportarCSV` preservados; `key="sac-table"/"price-table"` mantido |
-| S17-02 | Fatiar `FormCalculator.tsx:228` | Novos `form/AtalhosEntrada.tsx` + `AtalhosPrazo.tsx` + `PreviewPrincipal.tsx` | Atalhos 20/30/40/50% e 120/240/360/420m + preview idênticos; botão `disabled=!isValid` inalterado |
-| S17-03 | Fatiar `ConteudoEducativo.tsx:286` | Novos `education/conteudo.ts` + `PainelSistema.tsx` (prop `variante`) + `TabelaComparativa.tsx` + `AbasEducacao.tsx` | `PainelSAC`/`PainelPrice` unificados; tabela `critério/SAC/Price` idêntica |
-| S17-04 | Extrair `SimulacaoCard.tsx` | Novo `layout/SimulacaoCard.tsx` (de `App.tsx:32-58`) | Gradiente + badges `SAC/Price` pixel-idênticos; `App` só compõe `Header/Main/Footer` + `lazy` |
-| S17-05 | Fix `TabelaAmortizacao.tsx:17-20` | `results/TabelaAmortizacao.tsx` | Troca `setState` durante render por `useEffect(() => setPaginaAtual(1), [dados])`; teste `45→12` (`TabelaAmortizacao.test.tsx`) continua PASS; sem warning `StrictMode` |
-| S17-06 | Fix `GraficoLinha.tsx` + `InputField` | `results/GraficoLinha.tsx`, `ui/InputField.tsx` | `options` declara dep `rotuloEixoY` ou remove prop morta; `registerChart()` vai para `utils/chart.ts` (Sprint 18 pode completar); `forwardRef` removido (React 19); 4 gráficos renderizam igual |
+| S17-01 | Fatiar `FinancingComparison.tsx:244` | Novos `results/RecommendationCard.tsx` + `ChartsGrid.tsx` + `TableTabs.tsx` | Orquestrador ~60 linhas; tabs `SAC/PRICE` + `BotaoExportarCSV` preservados; `key="sac-table"/"price-table"` mantido |
+| S17-02 | Fatiar `FormCalculator.tsx:228` | Novos `form/DownPaymentShortcuts.tsx` + `TermShortcuts.tsx` + `PrincipalPreview.tsx` | Atalhos 20/30/40/50% e 120/240/360/420m + preview idênticos; botão `disabled=!isValid` inalterado |
+| S17-03 | Fatiar `EducationalContent.tsx:286` | Novos `education/content.ts` + `SystemPanel.tsx` (prop `variante`) + `ComparisonTable.tsx` + `EducationTabs.tsx` | `PainelSAC`/`PainelPrice` unificados; tabela `critério/SAC/Price` idêntica |
+| S17-04 | Extrair `SimulationCard.tsx` | Novo `layout/SimulationCard.tsx` (de `App.tsx:32-58`) | Gradiente + badges `SAC/Price` pixel-idênticos; `App` só compõe `Header/Main/Footer` + `lazy` |
+| S17-05 | Fix `AmortizationTable.tsx:17-20` | `results/AmortizationTable.tsx` | Troca `setState` durante render por `useEffect(() => setPaginaAtual(1), [dados])`; teste `45→12` (`AmortizationTable.test.tsx`) continua PASS; sem warning `StrictMode` |
+| S17-06 | Fix `LineChart.tsx` + `InputField` | `results/LineChart.tsx`, `ui/InputField.tsx` | `options` declara dep `rotuloEixoY` ou remove prop morta; `registerChart()` vai para `utils/chart.ts` (Sprint 18 pode completar); `forwardRef` removido (React 19); 4 gráficos renderizam igual |
 | S17-07 | Verificação + screenshots | `calculadora-fi/`, `docs/screenshots/` | `npx vitest run` total PASS + `npm run build` OK + recaptura manual `dev` + fill + screenshot se qualquer pixel mudou (per AGENTS.md) |
 
 ### Entregas

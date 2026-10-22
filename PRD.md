@@ -202,12 +202,12 @@ flowchart TD
 
 | ID | Requisito | Critério de Aceite | Onde |
 |----|-----------|-------------------|------|
-| FR-033 | Ponto de equilíbrio SAC vs Price | Exibe "a partir do NNNº mês a parcela SAC fica menor que a Price" | `ComparacaoFinanciamento.tsx` (`mesCruzamento`) |
-| FR-034 | Percentual de economia | Exibe `-X,X%` ao lado da economia em R$ | `ComparacaoFinanciamento.tsx` (`percentualEconomia`) |
+| FR-033 | Ponto de equilíbrio SAC vs Price | Exibe "a partir do NNNº mês a parcela SAC fica menor que a Price" | `FinancingComparison.tsx` (`mesCruzamento`) |
+| FR-034 | Percentual de economia | Exibe `-X,X%` ao lado da economia em R$ | `FinancingComparison.tsx` (`percentualEconomia`) |
 | FR-035 | Taxa anual equivalente | Exibe `≈ X,XX% a.a.` a partir da taxa mensal | `FormCalculator.tsx` (`taxaAnualEquivalente`) |
 | FR-036 | Atalhos de entrada e prazo | Botões 20/30/40/50% e 120/240/360/420m preenchem o campo | `FormCalculator.tsx` |
 | FR-037 | Preview do valor financiado | Exibe `Valor a financiar (Principal)` + % do imóvel antes de calcular | `FormCalculator.tsx` (`valorFinanciadoPreview`) |
-| FR-038 | Composição amortização/juros | Donut/texto `Amortização: X% / Juros: Y%` por sistema | `ResultadoHeader.tsx` |
+| FR-038 | Composição amortização/juros | Donut/texto `Amortização: X% / Juros: Y%` por sistema | `ResultHeader.tsx` |
 | FR-039 | Lazy loading + animação de entrada | `Comparacao`/`Educativo` via `lazy`+`Suspense`, `FadeIn` | `App.tsx`, `ui/FadeIn.tsx` |
 
 ---
@@ -425,7 +425,7 @@ Não aplicável — não há autenticação ou perfis de usuário.
 
 | Dúvida | Status |
 |--------|--------|
-| Usar Chart.js ou gráfico customizado em CSS? | Resolvido — Chart.js + react-chartjs-2 (`GraficoLinha.tsx`) |
+| Usar Chart.js ou gráfico customizado em CSS? | Resolvido — Chart.js + react-chartjs-2 (`LineChart.tsx`) |
 | Compartilhar via link externo ou apenas WhatsApp? | Resolvido — apenas WhatsApp (`WhatsAppShareButton.tsx`) |
 | Necessário testar em navegadores antigos? | Resolvido — escopo: últimas 2 versões (NFR-003, sem teste formal ainda) |
 
@@ -512,11 +512,11 @@ Onde:
 
 | Achado | Onde | Impacto |
 |--------|------|---------|
-| Lógica derivada dentro de UI (sem cobertura) | `ComparacaoFinanciamento.tsx:19-37` (`mesCruzamento`, `%economia`), `ResultadoHeader.tsx:19-25` (`principal`), `FormCalculator.tsx:34-62` (`taxaAnual`, `prazoAnos`, `preview`, `%entrada`) | Baixa testabilidade, risco de divergência |
+| Lógica derivada dentro de UI (sem cobertura) | `FinancingComparison.tsx:19-37` (`mesCruzamento`, `%economia`), `ResultHeader.tsx:19-25` (`principal`), `FormCalculator.tsx:34-62` (`taxaAnual`, `prazoAnos`, `preview`, `%entrada`) | Baixa testabilidade, risco de divergência |
 | Parsing de moeda/percentual duplicado (6 ocorrências) | `useFormCalculator.ts:37-38,157-158` + `FormCalculator.tsx:29-31` | Drift de formato; gotcha máscara `/100` (`format.ts`) |
 | Validação acoplada a formatação | `useFormCalculator.ts:53` chama `formatarEntradaMoeda()` dentro de `validate()`; `handleChange:104-118` vs `handleBlur:126-142` quase idênticas | Teste frágil, validador não reutilizável |
-| Componentes grandes (>200 linhas) | `ConteudoEducativo.tsx:286`, `ComparacaoFinanciamento.tsx:244`, `FormCalculator.tsx:228` (+ `PainelSAC` vs `PainelPrice` JSX idêntico) | Difícil revisar/testar |
-| Anti-patterns isolados | `TabelaAmortizacao.tsx:17-20` (`setState` durante render), `GraficoLinha.tsx:17-26,90-167` (`ChartJS.register()` em módulo + `options` ignora `rotuloEixoY`), `InputField` com `forwardRef` legado (desnecessário no React 19) | Extra render em `StrictMode`, prop morta |
+| Componentes grandes (>200 linhas) | `EducationalContent.tsx:286`, `FinancingComparison.tsx:244`, `FormCalculator.tsx:228` (+ `PainelSAC` vs `PainelPrice` JSX idêntico) | Difícil revisar/testar |
+| Anti-patterns isolados | `AmortizationTable.tsx:17-20` (`setState` durante render), `LineChart.tsx:17-26,90-167` (`ChartJS.register()` em módulo + `options` ignora `rotuloEixoY`), `InputField` com `forwardRef` legado (desnecessário no React 19) | Extra render em `StrictMode`, prop morta |
 | Mistura puro/impuro + over-segmentação | `csv.ts:46` (`downloadCSV` com DOM junto da geração), `sharing/` com 1 arquivo de 60 linhas, barrels inconsistentes | Dificulta mock/teste |
 
 ### 28.2 Princípios e restrições globais (valem para Sprints 13–18)
@@ -524,26 +524,26 @@ Onde:
 - Fluxo mantido: `components → hooks → utils → types`, sem ciclos. `components` só renderizam; todo cálculo vai para `utils/` puro.
 - Regras de negócio imutáveis: entrada ≥ 20% e < valor (RN-001), taxa 0–20%/mês, prazo 1–600 (RN-002/RN-003), arredondamento 2 casas com ajuste na última parcela (RN-004), CSV pt-BR `;` + `,` + `BOM \uFEFF` + seções `SAC —/Price —`.
 - Load-bearing intocável sem migração dedicada: `vite.config.ts` (`globals:true`, `jsdom`, `setupFiles:./src/test/setup.ts`, `css:true`), máscara `/100`, mensagens pt-BR.
-- Núcleo `calculos.ts` (SAC/Price/Totais/comparar) não muda na refatoração; invariantes travadas: `parcela = amort + juros`, `total - juros = principal`, `SAC.juros < Price.juros`.
+- Núcleo `calculations.ts` (SAC/Price/Totais/comparar) não muda na refatoração; invariantes travadas: `parcela = amort + juros`, `total - juros = principal`, `SAC.juros < Price.juros`.
 - Comandos de verificação por fase (em `calculadora-fi/`): `npx vitest run <escopo>`, `npm run lint`, `npm run format:check`, `npm run build` (`tsc -b && vite build`).
 
 ### 28.3 Arquitetura-alvo (sem mudar UX)
 
 ```text
 src/
-  constants/negocio.ts      # ENTRADA_MINIMA=0.2, TAXA_MAXIMA=20, PRAZO_MAXIMO=600, ITENS_POR_PAGINA=20, atalhos
+  constants/business.ts      # ENTRADA_MINIMA=0.2, TAXA_MAXIMA=20, PRAZO_MAXIMO=600, ITENS_POR_PAGINA=20, atalhos
   utils/
     format.ts               # + parseMoedaParaNumero(), parsePercentualParaNumero(), formatarPercentual()
-    calculos.ts             # inalterado no núcleo
-    analise.ts              # NOVO puro: mesCruzamento(), percentualEconomia(), valorPrincipal(), taxaAnualEquivalente(), prazoEmAnos(), percentualEntrada()
+    calculations.ts             # inalterado no núcleo
+    analysis.ts              # NOVO puro: mesCruzamento(), percentualEconomia(), valorPrincipal(), taxaAnualEquivalente(), prazoEmAnos(), percentualEntrada()
     csv.ts                  # só geração pura; downloadCSV → csvDownload.ts (DOM)
     chart.ts                # NOVO: cores SAC/PRICE + chartOptions() + registerChart()
-  domain/validacao.ts       # NOVO puro: validateFinanciamento(números) sem máscara/formatação
+  domain/validation.ts       # NOVO puro: validateFinanciamento(números) sem máscara/formatação
   components/
-    form/ (container + CamposFormulario + AtalhosEntrada/Prazo + PreviewPrincipal)
-    results/ (Comparacao orquestra + CartaoRecomendacao + GradeGraficos + AbasTabelas)
-    education/ (conteudo.ts + PainelSistema unificado + TabelaComparativa + AbasEducacao)
-    layout/ + SimulaCard.tsx (extraído de App.tsx:32-58)
+    form/ (container + CamposFormulario + DownPaymentShortcuts/TermShortcuts + PrincipalPreview)
+    results/ (FinancingComparison orquestra + RecommendationCard + ChartsGrid + TableTabs)
+    education/ (content.ts + SystemPanel unificado + ComparisonTable + EducationTabs)
+    layout/ + SimulationCard.tsx (extraído de App.tsx:32-58)
 ```
 
 ### 28.4 Fases (resumo; tarefas e DoD em SPRINTS.md)
@@ -551,9 +551,9 @@ src/
 | Fase | Sprint | Entrega |
 |------|--------|---------|
 | Fase 0 — Trava de segurança | Sprint 13 | Testes de caracterização do comportamento atual (sem código produtivo) |
-| Fase 1 — Derivados puros | Sprint 14 | `utils/analise.ts` + testes; UI consome (remove lógica de `Comparacao/ResultadoHeader/Form`) |
+| Fase 1 — Derivados puros | Sprint 14 | `utils/analysis.ts` + testes; UI consome (remove lógica de `Comparacao/ResultadoHeader/Form`) |
 | Fase 2 — Parsing único | Sprint 15 | `parseMoeda/Percentual` em `format.ts`; substitui 6 ocorrências + `toLocaleString` ad-hoc |
-| Fase 3 — Validação pura | Sprint 16 | `constants/negocio.ts` + `domain/validacao.ts`; hook vira adaptador fino |
+| Fase 3 — Validação pura | Sprint 16 | `constants/business.ts` + `domain/validation.ts`; hook vira adaptador fino |
 | Fase 4 — Fatiar componentes + 2 bugfixes seguros | Sprint 17 | Sub-componentes + `useEffect` em `Tabela` + `options` do `Grafico` + sem `forwardRef` |
 | Fase 5 — Higiene | Sprint 18 | Barrels consistentes, split `csv`, `chart.ts`, `sharing`, `oxlint`, limpeza `user-event` se morto |
 
@@ -562,7 +562,7 @@ src/
 | ID | Requisito | Critério de aceite |
 |----|-----------|-------------------|
 | RFR-001 | Nenhuma mudança visual/funcional | Screenshots e fluxos US-001–US-013 inalterados; testes existentes continuam passando sem ajuste de snapshot |
-| RFR-002 | Lógica derivada 100% em funções puras testadas | `mesCruzamento`, `%economia`, `principal`, `taxaAnual`, `prazoAnos`, `preview` cobertos em `analise.test.ts` |
+| RFR-002 | Lógica derivada 100% em funções puras testadas | `mesCruzamento`, `%economia`, `principal`, `taxaAnual`, `prazoAnos`, `preview` cobertos em `analysis.test.ts` |
 | RFR-003 | Parsing centralizado | Uma única implementação de parse moeda/percentual; zero ocorrências de `replace(/\./g,'')` fora de `format.ts` |
 | RFR-004 | Validação pura reutilizável | `validateFinanciamento` sem importar `format.ts`; mensagem formatada injetada pelo hook |
 | RFR-005 | Componentes ≤ ~150 linhas cada (alvo) | `Comparacao/Form/Educativo` fatiados; nenhum arquivo novo >150 linhas sem justificativa |

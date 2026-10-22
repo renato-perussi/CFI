@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import type { ComparacaoFinanciamento as ComparacaoType } from '../../types/financiamento';
-import { TabelaAmortizacao } from './TabelaAmortizacao';
-import { BotaoExportarCSV } from './BotaoExportarCSV';
+import type { ComparacaoFinanciamento as ComparacaoType } from '../../types/financing';
+import { TabelaAmortizacao } from './AmortizationTable';
+import { BotaoExportarCSV } from './ExportCSVButton';
 
 interface AbasTabelasProps {
   dados: ComparacaoType;

@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
-import type { Parcela } from '../../types/financiamento';
+import type { Parcela } from '../../types/financing';
 import { formatarMoeda } from '../../utils/format';
 import { Paginacao } from '../ui';
-import { ITENS_POR_PAGINA } from '../../constants/negocio';
+import { ITENS_POR_PAGINA } from '../../constants/business';
 
 interface TabelaAmortizacaoProps {
   titulo: string;

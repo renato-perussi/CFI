@@ -1,7 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { Header, Main, Footer, SimulacaoCard } from './components/layout';
 import { FadeIn } from './components/ui';
-import { useFinanciamento } from './hooks/useFinanciamento';
+import { useFinanciamento } from './hooks/useFinancing';
 
 const ComparacaoFinanciamento = lazy(() =>
   import('./components/results').then((m) => ({ default: m.ComparacaoFinanciamento }))

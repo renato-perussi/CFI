@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { TabelaAmortizacao } from '../TabelaAmortizacao';
-import type { Parcela } from '../../../types/financiamento';
+import { TabelaAmortizacao } from '../AmortizationTable';
+import type { Parcela } from '../../../types/financing';
 
 function criarParcelas(quantidade: number): Parcela[] {
   return Array.from({ length: quantidade }, (_, i) => ({

@@ -1,8 +1,8 @@
-import type { ComparacaoFinanciamento as ComparacaoType } from '../../types/financiamento';
-import { ResultadoHeader } from './ResultadoHeader';
-import { CartaoRecomendacao } from './CartaoRecomendacao';
-import { GradeGraficos } from './GradeGraficos';
-import { AbasTabelas } from './AbasTabelas';
+import type { ComparacaoFinanciamento as ComparacaoType } from '../../types/financing';
+import { ResultadoHeader } from './ResultHeader';
+import { CartaoRecomendacao } from './RecommendationCard';
+import { GradeGraficos } from './ChartsGrid';
+import { AbasTabelas } from './TableTabs';
 
 interface ComparacaoFinanciamentoProps {
   dados: ComparacaoType;

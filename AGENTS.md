@@ -6,17 +6,17 @@ Single app lives in `calculadora-fi/`. Run ALL npm commands there, never at root
 
 - `npm run dev` — Vite HMR at `:5173`
 - `npm run build` — `tsc -b && vite build` (typecheck is part of build; no separate command)
-- `npm run test` — `vitest run` (all; ~53 tests / 7 files)
-- `npx vitest run <path>` — single suite, e.g. `npx vitest run src/utils/calculos.test.ts`
+- `npm run test` — `vitest run` (all; ~123 tests / 10 files)
+- `npx vitest run <path>` — single suite, e.g. `npx vitest run src/utils/calculations.test.ts`
 - `npm run lint` / `npm run lint:fix` — OxLint (not ESLint; rules in `.oxlintrc.json`)
 - `npm run format` / `npm run format:check` — Prettier (`printWidth: 100`, single quotes, semi, `es5` trailing commas)
-- Requires Node 20+ (Vite 8). `dist/` is gitignored; production build was ~464KB.
+- Requires Node 20+ (Vite 8). `dist/` is gitignored; production build was ~460KB.
 
 ## Architecture
 
-- Entry: `src/main.tsx` → `src/App.tsx`. `App` lazy-loads (`lazy`+`Suspense`) `results/ComparacaoFinanciamento` and `education/ConteudoEducativo`.
-- State: `hooks/useFormCalculator` (masked inputs + validation) → `hooks/useFinanciamento` (orchestrates calc). Domain logic is pure and testable in `utils/calculos.ts`, `utils/csv.ts`, `utils/format.ts`.
-- Feature folders under `src/components/`: `form/`, `results/` (GraficoLinha/Chart.js, TabelaAmortizacao + `ui/Paginacao` at 20 rows/page, `BotaoExportarCSV`), `sharing/` (WhatsApp only), `education/`, `layout/`, `ui/`.
+- Entry: `src/main.tsx` → `src/App.tsx`. `App` lazy-loads (`lazy`+`Suspense`) `results/FinancingComparison` and `education/EducationalContent`.
+- State: `hooks/useFormCalculator` (masked inputs + validation) → `hooks/useFinancing` (orchestrates calc). Domain logic is pure and testable in `utils/calculations.ts`, `utils/csv.ts`, `utils/format.ts`.
+- Feature folders under `src/components/`: `form/`, `results/` (LineChart/Chart.js, AmortizationTable + `ui/Pagination` at 20 rows/page, `ExportCSVButton`, `WhatsAppShareButton`), `education/`, `layout/`, `ui/`.
 - Test setup is load-bearing: `vite.config.ts` needs `globals: true`, `environment: jsdom`, `setupFiles: ./src/test/setup.ts`, `css: true`.
 
 ## Gotchas

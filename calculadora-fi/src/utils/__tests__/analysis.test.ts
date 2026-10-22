@@ -12,9 +12,9 @@ import {
   formatarPrazoEmAnos,
   calcularPercentualEntrada,
   calcularValorFinanciadoPreview,
-} from '../analise';
-import { calcularSAC, calcularPrice, compararFinanciamentos } from '../calculos';
-import type { Parcela } from '../../types/financiamento';
+} from '../analysis';
+import { calcularSAC, calcularPrice, compararFinanciamentos } from '../calculations';
+import type { Parcela } from '../../types/financing';
 
 function tabelaSintetica(parcelas: number[]): Parcela[] {
   return parcelas.map((parcela, i) => ({

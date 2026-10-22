@@ -1,4 +1,4 @@
-import { ENTRADAS_SUGERIDAS } from '../../constants/negocio';
+import { ENTRADAS_SUGERIDAS } from '../../constants/business';
 
 interface AtalhosEntradaProps {
   valorImovelNum: number;

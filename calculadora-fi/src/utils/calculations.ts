@@ -1,4 +1,4 @@
-import type { Parcela, Resultado, ComparacaoFinanciamento } from '../types/financiamento';
+import type { Parcela, Resultado, ComparacaoFinanciamento } from '../types/financing';
 
 export function calcularSAC(valorFinanciado: number, taxaJuros: number, prazo: number): Resultado {
   const taxaDecimal = taxaJuros / 100;

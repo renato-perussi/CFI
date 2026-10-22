@@ -1,4 +1,4 @@
 export { FormCalculator } from './FormCalculator';
-export { AtalhosEntrada } from './AtalhosEntrada';
-export { AtalhosPrazo } from './AtalhosPrazo';
-export { PreviewPrincipal } from './PreviewPrincipal';
+export { AtalhosEntrada } from './DownPaymentShortcuts';
+export { AtalhosPrazo } from './TermShortcuts';
+export { PreviewPrincipal } from './PrincipalPreview';

@@ -1,4 +1,4 @@
-import type { ComparacaoFinanciamento } from '../../types/financiamento';
+import type { ComparacaoFinanciamento } from '../../types/financing';
 import { formatarMoeda } from '../../utils/format';
 
 interface WhatsAppShareButtonProps {

@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import type { AbaEducacao } from './conteudo';
-import { AbasEducacao } from './AbasEducacao';
-import { PainelSistema } from './PainelSistema';
-import { TabelaComparativa } from './TabelaComparativa';
+import type { AbaEducacao } from './content';
+import { AbasEducacao } from './EducationTabs';
+import { PainelSistema } from './SystemPanel';
+import { TabelaComparativa } from './ComparisonTable';
 
 /** Guia de decisão SAC vs Price (orquestra abas e painéis). */
 export function ConteudoEducativo() {

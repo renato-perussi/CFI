@@ -180,12 +180,11 @@ Execute dentro de `calculadora-fi/`:
 │   │   │   ├── education/   # Conteúdo SAC/Price/Comparação
 │   │   │   ├── form/        # FormCalculator (+ __tests__/)
 │   │   │   ├── layout/      # Header, Main, Footer
-│   │   │   ├── results/     # Comparação, gráficos, tabelas, CSV (+ __tests__/)
-│   │   │   ├── sharing/     # Botão WhatsApp
-│   │   │   └── ui/          # FormField, InputField, Paginacao, FadeIn
-│   │   ├── hooks/           # useFinanciamento, useFormCalculator (+ __tests__/)
+│   │   │   ├── results/     # Comparação, gráficos, tabelas, CSV, WhatsApp (+ __tests__/)
+│   │   │   └── ui/          # FormField, InputField, Pagination, FadeIn
+│   │   ├── hooks/           # useFinancing, useFormCalculator (+ __tests__/)
 │   │   ├── types/           # Financiamento, Resultado, Parcela
-│   │   ├── utils/           # calculos, format, csv (+ __tests__/)
+│   │   ├── utils/           # calculations, format, csv (+ __tests__/)
 │   │   ├── test/            # setup Vitest
 │   │   ├── App.tsx
 │   │   ├── main.tsx
@@ -193,7 +192,7 @@ Execute dentro de `calculadora-fi/`:
 │   ├── public/              # favicon.svg, og-image.svg
 │   ├── .oxlintrc.json / .prettierrc
 │   ├── vite.config.ts
-│   ├── dist/                # build (gerado, 464KB em 22/10/2026)
+│   ├── dist/                # build (gerado, 460KB em 22/10/2026)
 │   └── package.json
 ├── docs/
 │   └── screenshots/         # Prints usados neste README
@@ -228,10 +227,10 @@ Validações exibem mensagens em pt-BR no formulário.
 
 ```bash
 cd calculadora-fi
-npm run test        # 53/53 Vitest passando (7 arquivos) — verificado em 22/10/2026
+npm run test        # 123/123 Vitest passando (10 arquivos) — verificado em 22/10/2026
 npm run lint        # oxlint limpo — verificado em 22/10/2026
 npm run format:check
-npm run build       # tsc -b + vite build OK — dist/ 464KB (<500KB) em 22/10/2026
+npm run build       # tsc -b + vite build OK — dist/ 460KB (<500KB) em 22/10/2026
 ```
 
 Critérios DoD por sprint: testes passando, build limpo, responsivo (validado em 390px em 22/10/2026; faixa total 320–2560 e cross-browser ainda sem teste formal — ver `SPRINTS.md`).

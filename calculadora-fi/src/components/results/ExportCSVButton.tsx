@@ -1,4 +1,4 @@
-import type { Parcela } from '../../types/financiamento';
+import type { Parcela } from '../../types/financing';
 import { gerarCSVCompleto } from '../../utils/csv';
 import { downloadCSV } from '../../utils/csvDownload';
 

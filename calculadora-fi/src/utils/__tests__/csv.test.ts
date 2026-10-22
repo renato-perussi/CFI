@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { gerarCSV, gerarCSVCompleto } from '../csv';
-import type { Parcela } from '../../types/financiamento';
+import type { Parcela } from '../../types/financing';
 
 const tabelaMock: Parcela[] = [
   { mes: 1, amortizacao: 833.33, juros: 1000, parcela: 1833.33, saldoDevedor: 99166.67 },

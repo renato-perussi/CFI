@@ -1,5 +1,5 @@
-import type { ComparacaoFinanciamento as ComparacaoType } from '../../types/financiamento';
-import { GraficoLinha } from './GraficoLinha';
+import type { ComparacaoFinanciamento as ComparacaoType } from '../../types/financing';
+import { GraficoLinha } from './LineChart';
 
 interface GradeGraficosProps {
   dados: ComparacaoType;

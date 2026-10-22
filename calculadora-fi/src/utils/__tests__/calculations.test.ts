@@ -1,6 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { calcularSAC, calcularPrice, calcularTotais, compararFinanciamentos } from '../calculos';
-import type { Parcela } from '../../types/financiamento';
+import {
+  calcularSAC,
+  calcularPrice,
+  calcularTotais,
+  compararFinanciamentos,
+} from '../calculations';
+import type { Parcela } from '../../types/financing';
 
 describe('calcularSAC', () => {
   it('deve calcular parcelas com amortização fixa decrescente', () => {

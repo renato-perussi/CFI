@@ -1,4 +1,4 @@
-import { ENTRADA_MINIMA, PRAZO_MAXIMO, TAXA_MAXIMA } from '../constants/negocio';
+import { ENTRADA_MINIMA, PRAZO_MAXIMO, TAXA_MAXIMA } from '../constants/business';
 
 /**
  * Regras de negócio puras (mensagens pt-BR, mesma ordem de guardas).

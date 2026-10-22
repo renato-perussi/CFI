@@ -6,11 +6,11 @@ import {
   calcularTaxaAnualEquivalente,
   formatarPrazoEmAnos,
   calcularValorFinanciadoPreview,
-} from '../../utils/analise';
-import { AtalhosEntrada } from './AtalhosEntrada';
-import { AtalhosPrazo } from './AtalhosPrazo';
-import { PreviewPrincipal } from './PreviewPrincipal';
-import type { Financiamento } from '../../types/financiamento';
+} from '../../utils/analysis';
+import { AtalhosEntrada } from './DownPaymentShortcuts';
+import { AtalhosPrazo } from './TermShortcuts';
+import { PreviewPrincipal } from './PrincipalPreview';
+import type { Financiamento } from '../../types/financing';
 
 interface FormCalculatorProps {
   onSubmit: (financiamento: Financiamento) => void;

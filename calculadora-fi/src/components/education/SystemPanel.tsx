@@ -1,4 +1,4 @@
-import { CONTEUDO } from './conteudo';
+import { CONTEUDO } from './content';
 
 interface PainelSistemaProps {
   variante: 'sac' | 'price';

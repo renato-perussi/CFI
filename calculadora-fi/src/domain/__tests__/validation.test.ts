@@ -8,7 +8,7 @@
  * - Guarda `valorImovel > 0` antes da regra de 20%.
  */
 import { describe, it, expect } from 'vitest';
-import { validateFinanciamento } from '../validacao';
+import { validateFinanciamento } from '../validation';
 
 const VALIDO = {
   valorImovel: 500000,

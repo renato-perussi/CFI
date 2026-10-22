@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
-import type { Financiamento, ComparacaoFinanciamento } from '../types/financiamento';
-import { calcularSAC, calcularPrice, compararFinanciamentos } from '../utils/calculos';
+import type { Financiamento, ComparacaoFinanciamento } from '../types/financing';
+import { calcularSAC, calcularPrice, compararFinanciamentos } from '../utils/calculations';
 
 export function useFinanciamento() {
   const [resultado, setResultado] = useState<ComparacaoFinanciamento | null>(null);

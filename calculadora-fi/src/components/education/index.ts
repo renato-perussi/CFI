@@ -1,6 +1,6 @@
-export { ConteudoEducativo } from './ConteudoEducativo';
-export { AbasEducacao } from './AbasEducacao';
-export { PainelSistema } from './PainelSistema';
-export { TabelaComparativa } from './TabelaComparativa';
-export { CONTEUDO } from './conteudo';
-export type { AbaEducacao } from './conteudo';
+export { ConteudoEducativo } from './EducationalContent';
+export { AbasEducacao } from './EducationTabs';
+export { PainelSistema } from './SystemPanel';
+export { TabelaComparativa } from './ComparisonTable';
+export { CONTEUDO } from './content';
+export type { AbaEducacao } from './content';

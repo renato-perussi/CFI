@@ -1,4 +1,4 @@
-import type { AbaEducacao } from './conteudo';
+import type { AbaEducacao } from './content';
 
 interface AbasEducacaoProps {
   abaAtiva: AbaEducacao;

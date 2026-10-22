@@ -1,4 +1,4 @@
-import { CONTEUDO } from './conteudo';
+import { CONTEUDO } from './content';
 
 /** Tabela critério × SAC × Price. */
 export function TabelaComparativa() {

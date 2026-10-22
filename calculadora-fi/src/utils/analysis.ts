@@ -1,8 +1,8 @@
 /**
  * Derivados de UI em funções puras testadas. Recebem números já parseados;
- * sem estado React. Núcleo `calculos.ts` intocado.
+ * sem estado React. Núcleo `calculations.ts` intocado.
  */
-import type { Parcela } from '../types/financiamento';
+import type { Parcela } from '../types/financing';
 import { formatarPercentual } from './format';
 
 /**

@@ -1,6 +1,6 @@
-import type { Resultado } from '../../types/financiamento';
+import type { Resultado } from '../../types/financing';
 import { formatarMoeda } from '../../utils/format';
-import { calcularValorPrincipal } from '../../utils/analise';
+import { calcularValorPrincipal } from '../../utils/analysis';
 
 interface ResultadoHeaderProps {
   titulo: string;

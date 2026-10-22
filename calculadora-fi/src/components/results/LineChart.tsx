@@ -1,6 +1,6 @@
 import { memo, useMemo } from 'react';
 import { Line } from 'react-chartjs-2';
-import type { Resultado } from '../../types/financiamento';
+import type { Resultado } from '../../types/financing';
 import { formatarMoedaCompacta, formatarNumero } from '../../utils/format';
 import {
   registerChart,

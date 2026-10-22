@@ -1,4 +1,4 @@
-import { PRAZOS_SUGERIDOS } from '../../constants/negocio';
+import { PRAZOS_SUGERIDOS } from '../../constants/business';
 
 interface AtalhosPrazoProps {
   prazoMeses: string;

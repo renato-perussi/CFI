@@ -49,10 +49,9 @@ src/
     education/    # Conteudo educativo SAC vs Price
     form/         # Formulario de entrada
     layout/       # Header, Main, Footer
-    results/      # Tabelas, graficos, comparacao, exportacao
-    sharing/      # Botao WhatsApp
-    ui/           # Componentes genericos (InputField, FadeIn, Paginacao)
-  hooks/          # useFinanciamento, useFormCalculator
+    results/      # Tabelas, graficos, comparacao, exportacao, WhatsApp
+    ui/           # Componentes genericos (InputField, FadeIn, Pagination)
+  hooks/          # useFinancing, useFormCalculator
   types/          # Interfaces TypeScript
-  utils/          # Calculos, formatacao, CSV
+  utils/          # Calculations, formatacao, CSV
 ```

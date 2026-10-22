@@ -1,5 +1,5 @@
 import { FormCalculator } from '../form';
-import type { Financiamento } from '../../types/financiamento';
+import type { Financiamento } from '../../types/financing';
 
 interface SimulacaoCardProps {
   onSubmit: (financiamento: Financiamento) => void;
