@@ -1,6 +1,12 @@
 import { FormField } from '../ui/FormField';
 import { useFormCalculator } from '../../hooks/useFormCalculator';
 import { formatarMoeda } from '../../utils/format';
+import {
+  calcularPercentualEntrada,
+  calcularTaxaAnualEquivalente,
+  formatarPrazoEmAnos,
+  calcularValorFinanciadoPreview,
+} from '../../utils/analise';
 import type { Financiamento } from '../../types/financiamento';
 
 interface FormCalculatorProps {
@@ -31,35 +37,13 @@ export function FormCalculator({ onSubmit }: FormCalculatorProps) {
   const taxaMensalNum = parseFloat(values.taxaJuros.replace(',', '.')) || 0;
   const prazoNum = parseInt(values.prazoMeses, 10) || 0;
 
-  const percentualEntrada =
-    valorImovelNum > 0 && entradaNum > 0
-      ? `${((entradaNum / valorImovelNum) * 100).toLocaleString('pt-BR', {
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 1,
-        })}% do imóvel`
-      : 'Mín. 20%';
+  const percentualEntrada = calcularPercentualEntrada(valorImovelNum, entradaNum);
 
-  const taxaAnualEquivalente =
-    taxaMensalNum > 0
-      ? `≈ ${((Math.pow(1 + taxaMensalNum / 100, 12) - 1) * 100).toLocaleString('pt-BR', {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })}% a.a.`
-      : 'Taxa efetiva';
+  const taxaAnualEquivalente = calcularTaxaAnualEquivalente(taxaMensalNum);
 
-  const prazoEmAnos = (() => {
-    if (prazoNum <= 0) return 'Máx. 600 meses';
-    const anos = Math.floor(prazoNum / 12);
-    const mesesRestantes = prazoNum % 12;
-    if (anos === 0) return `${mesesRestantes} ${mesesRestantes === 1 ? 'mês' : 'meses'}`;
-    if (mesesRestantes === 0) return `${anos} ${anos === 1 ? 'ano' : 'anos'}`;
-    return `${anos}a ${mesesRestantes}m`;
-  })();
+  const prazoEmAnos = formatarPrazoEmAnos(prazoNum);
 
-  const valorFinanciadoPreview =
-    valorImovelNum > 0 && entradaNum >= valorImovelNum * 0.2 && entradaNum < valorImovelNum
-      ? valorImovelNum - entradaNum
-      : null;
+  const valorFinanciadoPreview = calcularValorFinanciadoPreview(valorImovelNum, entradaNum);
 
   return (
     <form onSubmit={handleFormSubmit} className="space-y-6">

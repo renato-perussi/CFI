@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import type { ComparacaoFinanciamento as ComparacaoType } from '../../types/financiamento';
 import { formatarMoeda } from '../../utils/format';
+import { calcularMesCruzamento, calcularPercentualEconomia } from '../../utils/analise';
 import { ResultadoHeader } from './ResultadoHeader';
 import { TabelaAmortizacao } from './TabelaAmortizacao';
 import { GraficoLinha } from './GraficoLinha';
@@ -16,25 +17,13 @@ export function ComparacaoFinanciamento({ dados }: ComparacaoFinanciamentoProps)
 
   const isSAC = dados.melhorOpcao === 'SAC';
 
-  const mesCruzamento = useMemo(() => {
-    const tabelaSAC = dados.resultadoSAC.tabela;
-    const tabelaPrice = dados.resultadoPrice.tabela;
-    for (let i = 0; i < tabelaSAC.length; i++) {
-      if (tabelaSAC[i] && tabelaPrice[i] && tabelaSAC[i].parcela <= tabelaPrice[i].parcela) {
-        return tabelaSAC[i].mes;
-      }
-    }
-    return null;
-  }, [dados]);
+  const mesCruzamento = useMemo(
+    () => calcularMesCruzamento(dados.resultadoSAC.tabela, dados.resultadoPrice.tabela),
+    [dados]
+  );
 
   const maiorTotal = Math.max(dados.resultadoSAC.totalPago, dados.resultadoPrice.totalPago);
-  const percentualEconomia =
-    maiorTotal > 0
-      ? ((dados.economia / maiorTotal) * 100).toLocaleString('pt-BR', {
-          minimumFractionDigits: 1,
-          maximumFractionDigits: 1,
-        })
-      : '0,0';
+  const percentualEconomia = calcularPercentualEconomia(dados.economia, maiorTotal);
 
   return (
     <div className="space-y-8">

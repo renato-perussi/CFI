@@ -1,5 +1,6 @@
 import type { Resultado } from '../../types/financiamento';
 import { formatarMoeda } from '../../utils/format';
+import { calcularValorPrincipal } from '../../utils/analise';
 
 interface ResultadoHeaderProps {
   titulo: string;
@@ -16,10 +17,7 @@ export function ResultadoHeader({
 }: ResultadoHeaderProps) {
   const isSAC = variante === 'sac';
 
-  const valorPrincipal = Math.max(
-    Number((resultado.totalPago - resultado.totalJuros).toFixed(2)),
-    0
-  );
+  const valorPrincipal = calcularValorPrincipal(resultado.totalPago, resultado.totalJuros);
   const percentualPrincipal =
     resultado.totalPago > 0 ? Math.round((valorPrincipal / resultado.totalPago) * 100) : 100;
   const percentualJuros = 100 - percentualPrincipal;
