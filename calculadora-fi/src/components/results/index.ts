@@ -6,3 +6,4 @@ export { GradeGraficos } from './GradeGraficos';
 export { AbasTabelas } from './AbasTabelas';
 export { GraficoLinha } from './GraficoLinha';
 export { BotaoExportarCSV } from './BotaoExportarCSV';
+export { WhatsAppShareButton } from './WhatsAppShareButton';

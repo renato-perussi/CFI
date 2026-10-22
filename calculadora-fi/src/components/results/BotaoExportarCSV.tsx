@@ -1,5 +1,6 @@
 import type { Parcela } from '../../types/financiamento';
-import { gerarCSVCompleto, downloadCSV } from '../../utils/csv';
+import { gerarCSVCompleto } from '../../utils/csv';
+import { downloadCSV } from '../../utils/csvDownload';
 
 interface BotaoExportarCSVProps {
   dadosSAC: Parcela[];

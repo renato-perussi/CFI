@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import type { ComparacaoFinanciamento as ComparacaoType } from '../../types/financiamento';
 import { formatarMoeda } from '../../utils/format';
 import { calcularMesCruzamento, calcularPercentualEconomia } from '../../utils/analise';
-import { WhatsAppShareButton } from '../sharing/WhatsAppShareButton';
+import { WhatsAppShareButton } from './WhatsAppShareButton';
 
 interface CartaoRecomendacaoProps {
   dados: ComparacaoType;

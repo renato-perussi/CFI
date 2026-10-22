@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import type { Parcela } from '../../types/financiamento';
 import { formatarMoeda } from '../../utils/format';
-import { Paginacao } from '../ui/Paginacao';
+import { Paginacao } from '../ui';
 import { ITENS_POR_PAGINA } from '../../constants/negocio';
 
 interface TabelaAmortizacaoProps {

@@ -1,8 +1,15 @@
 import { memo, useMemo } from 'react';
 import { Line } from 'react-chartjs-2';
 import type { Resultado } from '../../types/financiamento';
-import { formatarMoeda, formatarMoedaCompacta, formatarNumero } from '../../utils/format';
-import { registerChart, COR_SAC, COR_SAC_BG, COR_PRICE, COR_PRICE_BG } from '../../utils/chart';
+import { formatarMoedaCompacta, formatarNumero } from '../../utils/format';
+import {
+  registerChart,
+  criarTooltipPadrao,
+  COR_SAC,
+  COR_SAC_BG,
+  COR_PRICE,
+  COR_PRICE_BG,
+} from '../../utils/chart';
 
 registerChart();
 
@@ -78,25 +85,7 @@ export const GraficoLinha = memo(function GraficoLinha({
         title: {
           display: false,
         },
-        tooltip: {
-          backgroundColor: '#0f172a',
-          titleFont: { family: 'Inter, sans-serif', size: 12, weight: 600 },
-          bodyFont: { family: 'Inter, sans-serif', size: 12 },
-          padding: 12,
-          cornerRadius: 10,
-          displayColors: true,
-          boxWidth: 8,
-          boxHeight: 8,
-          boxPadding: 6,
-          callbacks: {
-            title: (items: Array<{ label: string }>) => `Mês ${items[0].label}`,
-            label: (context: { dataset: { label?: string }; parsed: { y: number | null } }) => {
-              const valor = context.parsed.y;
-              if (valor === null) return '';
-              return ` ${context.dataset.label}: ${formatarMoeda(valor)}`;
-            },
-          },
-        },
+        tooltip: criarTooltipPadrao(),
       },
       scales: {
         x: {
