@@ -23,10 +23,5 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  /* Sprint 14 (temporário): o teste de caracterização da Sprint 16 ainda está
-     RED (módulo `src/domain/validacao.ts` só será criado na Sprint 16, S16-02).
-     Excluído do `tsc -b` para manter `npm run build` OK (S14-05); o Vitest
-     continua executando o arquivo. REMOVER esta linha na Sprint 16. */
-  "exclude": ["src/domain/__tests__/validacao.test.ts"],
   "include": ["src"]
 }

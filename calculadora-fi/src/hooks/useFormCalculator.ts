@@ -7,13 +7,11 @@ import {
   parseMoedaParaNumero,
   parsePercentualParaNumero,
 } from '../utils/format';
+import { ENTRADA_MINIMA } from '../constants/negocio';
+import { validateFinanciamento, type ErrosFinanciamento } from '../domain/validacao';
 
-export interface FormErrors {
-  valorImovel?: string;
-  entrada?: string;
-  taxaJuros?: string;
-  prazoMeses?: string;
-}
+/** Mesma forma de `ErrosFinanciamento` (domínio); mantido o nome usado pela UI. */
+export type FormErrors = ErrosFinanciamento;
 
 export interface FormValues {
   valorImovel: string;
@@ -29,54 +27,46 @@ const initialValues: FormValues = {
   prazoMeses: '',
 };
 
+/** Compõe o `minimoFormatado` (`'60.000,00'`) do validador; `undefined` com imóvel inválido. */
+function formatarMinimoEntrada(valorImovel: number): string | undefined {
+  if (isNaN(valorImovel) || valorImovel <= 0) return undefined;
+  return formatarEntradaMoeda(String(Math.round(valorImovel * ENTRADA_MINIMA * 100)));
+}
+
 export function useFormCalculator() {
   const [values, setValues] = useState<FormValues>(initialValues);
   const [errors, setErrors] = useState<FormErrors>({});
 
+  /** Adaptador: parse (`format.ts`) → valida (`domain`) → formata mensagem. */
   const validate = useCallback((vals: FormValues): FormErrors => {
-    const newErrors: FormErrors = {};
-
     const valorImovel = parseMoedaParaNumero(vals.valorImovel);
-    const entrada = parseMoedaParaNumero(vals.entrada);
-    const taxaJuros = parsePercentualParaNumero(vals.taxaJuros);
-    const prazoMeses = parseInt(vals.prazoMeses, 10);
-
-    if (!vals.valorImovel || isNaN(valorImovel) || valorImovel <= 0) {
-      newErrors.valorImovel = 'Valor do imóvel deve ser maior que zero';
-    }
-
-    if (!vals.entrada && vals.entrada !== '0') {
-      newErrors.entrada = 'Campo obrigatório';
-    } else if (isNaN(entrada) || entrada < 0) {
-      newErrors.entrada = 'Entrada deve ser maior ou igual a zero';
-    } else if (valorImovel > 0) {
-      const entradaMinima = valorImovel * 0.2;
-      if (entrada < entradaMinima) {
-        const minimoFormatado = formatarEntradaMoeda(String(Math.round(entradaMinima * 100)));
-        newErrors.entrada = `Entrada mínima de R$ ${minimoFormatado} (20%)`;
-      } else if (entrada >= valorImovel) {
-        newErrors.entrada = 'Entrada deve ser menor que o valor do imóvel';
-      }
-    }
-
-    if (!vals.taxaJuros && vals.taxaJuros !== '0') {
-      newErrors.taxaJuros = 'Campo obrigatório';
-    } else if (isNaN(taxaJuros) || taxaJuros < 0) {
-      newErrors.taxaJuros = 'Taxa de juros deve ser maior ou igual a zero';
-    } else if (taxaJuros > 20) {
-      newErrors.taxaJuros = 'Taxa de juros máxima de 20% ao mês';
-    }
-
-    if (!vals.prazoMeses) {
-      newErrors.prazoMeses = 'Campo obrigatório';
-    } else if (isNaN(prazoMeses) || prazoMeses <= 0) {
-      newErrors.prazoMeses = 'Prazo deve ser maior que zero';
-    } else if (prazoMeses > 600) {
-      newErrors.prazoMeses = 'Prazo máximo de 600 meses';
-    }
-
-    return newErrors;
+    return validateFinanciamento(
+      {
+        valorImovel,
+        entrada: parseMoedaParaNumero(vals.entrada),
+        taxaJuros: parsePercentualParaNumero(vals.taxaJuros),
+        prazoMeses: parseInt(vals.prazoMeses, 10),
+      },
+      formatarMinimoEntrada(valorImovel)
+    );
   }, []);
+
+  /** Revalida só o erro de `entrada` quando `valorImovel` muda (regra de 20%). */
+  const revalidarCruzada = useCallback(
+    (vals: FormValues, field: keyof FormValues, base: FormErrors): FormErrors => {
+      const nextErrors = { ...base };
+      if (field === 'valorImovel' && vals.entrada) {
+        const fieldErrors = validate(vals);
+        if (fieldErrors.entrada) {
+          nextErrors.entrada = fieldErrors.entrada;
+        } else {
+          delete nextErrors.entrada;
+        }
+      }
+      return nextErrors;
+    },
+    [validate]
+  );
 
   const isValid = useMemo(() => {
     const validationErrors = validate(values);
@@ -106,20 +96,10 @@ export function useFormCalculator() {
       setErrors((prev) => {
         const nextErrors = { ...prev };
         delete nextErrors[field];
-
-        if (field === 'valorImovel' && nextValues.entrada) {
-          const fieldErrors = validate(nextValues);
-          if (fieldErrors.entrada) {
-            nextErrors.entrada = fieldErrors.entrada;
-          } else {
-            delete nextErrors.entrada;
-          }
-        }
-
-        return nextErrors;
+        return revalidarCruzada(nextValues, field, nextErrors);
       });
     },
-    [values, validate]
+    [values, revalidarCruzada]
   );
 
   const handleBlur = useCallback(
@@ -132,19 +112,10 @@ export function useFormCalculator() {
         } else {
           delete nextErrors[field];
         }
-
-        if (field === 'valorImovel' && values.entrada) {
-          if (fieldErrors.entrada) {
-            nextErrors.entrada = fieldErrors.entrada;
-          } else {
-            delete nextErrors.entrada;
-          }
-        }
-
-        return nextErrors;
+        return revalidarCruzada(values, field, nextErrors);
       });
     },
-    [values, validate]
+    [values, validate, revalidarCruzada]
   );
 
   const validateAll = useCallback(() => {

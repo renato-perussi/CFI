@@ -76,7 +76,7 @@ describe('formatarEntradaPrazo', () => {
   });
 });
 
-describe('parseMoedaParaNumero (Sprint 15 — inversa exata da máscara /100)', () => {
+describe('parseMoedaParaNumero (inversa da máscara /100)', () => {
   it('deve converter moeda mascarada pt-BR em número', () => {
     expect(parseMoedaParaNumero('300.000,00')).toBe(300000);
     expect(parseMoedaParaNumero('60.000,00')).toBe(60000);
@@ -97,7 +97,7 @@ describe('parseMoedaParaNumero (Sprint 15 — inversa exata da máscara /100)', 
   });
 });
 
-describe('parsePercentualParaNumero (Sprint 15 — inversa exata da máscara /100)', () => {
+describe('parsePercentualParaNumero (inversa da máscara /100)', () => {
   it('deve converter percentual mascarado pt-BR em número', () => {
     expect(parsePercentualParaNumero('0,85')).toBe(0.85);
     expect(parsePercentualParaNumero('1,25')).toBe(1.25);
@@ -122,7 +122,7 @@ describe('parsePercentualParaNumero (Sprint 15 — inversa exata da máscara /10
   });
 });
 
-describe('formatarPercentual (Sprint 15 — formatação percentual central)', () => {
+describe('formatarPercentual', () => {
   it('padrão 1 casa com mínimo 1 (economia: 4,3 / 10,0 / 0,0)', () => {
     expect(formatarPercentual(4.3478)).toBe('4,3');
     expect(formatarPercentual(10)).toBe('10,0');

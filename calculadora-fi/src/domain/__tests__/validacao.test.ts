@@ -1,22 +1,11 @@
 /**
- * Sprint 13 — Trava de Segurança (caracterização, RED).
+ * Caracterização: trava as mensagens pt-BR do validador puro.
  *
- * Espelha as mensagens pt-BR atuais do `useFormCalculator.validate`
- * (`src/hooks/useFormCalculator.ts:34-77`) como baseline para a extração do
- * validador puro na Sprint 16 (RFR-004). NENHUM arquivo produtivo muda aqui.
- *
- * Estes testes importam de `../validacao` (`src/domain/validacao.ts`), módulo
- * que ainda NÃO existe — estado esperado: FAIL por "Failed to resolve import",
- * com os 53 testes existentes em PASS.
- *
- * Contrato travado (assinatura-alvo Sprint 16):
- * `validateFinanciamento({ valorImovel, entrada, taxaJuros, prazoMeses }, minimoFormatado?)`
- * - Recebe NÚMEROS já parseados (máscara resolvida no hook via `format.ts`).
- * - `NaN` representa campo vazio (ex.: `parseFloat('')`) → `'Campo obrigatório'`,
- *   exceto `valorImovel`, que hoje responde `'Valor do imóvel deve ser maior que zero'`.
- * - `minimoFormatado` (ex.: `'60.000,00'`) é fornecido pelo hook para compor
- *   `'Entrada mínima de R$ 60.000,00 (20%)'` sem importar `format.ts` no domínio.
- * - Mensagens idênticas às atuais; guarda `valorImovel > 0` antes da regra de 20%.
+ * - Recebe números já parseados; `NaN` = campo vazio → `'Campo obrigatório'`
+ *   (exceto `valorImovel` → `'Valor do imóvel deve ser maior que zero'`).
+ * - `minimoFormatado` (ex.: `'60.000,00'`) vem do hook para compor
+ *   `'Entrada mínima de R$ 60.000,00 (20%)'` sem `format.ts` no domínio.
+ * - Guarda `valorImovel > 0` antes da regra de 20%.
  */
 import { describe, it, expect } from 'vitest';
 import { validateFinanciamento } from '../validacao';

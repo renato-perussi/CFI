@@ -1,28 +1,7 @@
 /**
- * Sprint 13 — Trava de Segurança (caracterização, RED).
- *
- * Trava o comportamento atual dos derivados de UI antes da refatoração
- * (RFR-001/RFR-002). NENHUM arquivo produtivo muda nesta sprint.
- *
- * Estes testes importam de `../analise` (`src/utils/analise.ts`), módulo que
- * ainda NÃO existe — serão implementados na Sprint 14. Estado esperado:
- * FAIL por "Failed to resolve import", com os 53 testes existentes em PASS.
- *
- * Comportamento travado (fontes — não alterar expectativas sem PRD):
- * - `calcularMesCruzamento`: scan linear de `ComparacaoFinanciamento.tsx:19-28`
- *   (`tabelaSAC[i].parcela <= tabelaPrice[i].parcela` → `mes`, senão `null`).
- * - `calcularPercentualEconomia`: `ComparacaoFinanciamento.tsx:30-37`
- *   (`(economia/maiorTotal*100)` pt-BR 1 casa; `maiorTotal<=0` → `'0,0'`).
- * - `calcularValorPrincipal`: `ResultadoHeader.tsx:19-25`
- *   (`max(Number((totalPago-totalJuros).toFixed(2)), 0)`).
- * - `calcularTaxaAnualEquivalente`: `FormCalculator.tsx:42-48`
- *   (`(pow(1+m/100,12)-1)*100` pt-BR 2 casas → `'≈ X,XX% a.a.'`; `<=0` → `'Taxa efetiva'`).
- * - `formatarPrazoEmAnos`: `FormCalculator.tsx:50-57` (IIFE prazo → rótulo).
- * - `calcularPercentualEntrada`: `FormCalculator.tsx:34-40`
- *   (`(entrada/valorImovel*100)` pt-BR 0-1 casa + `'% do imóvel'`; inválido → `'Mín. 20%'`).
- * - `calcularValorFinanciadoPreview`: `FormCalculator.tsx:59-62`
- *   (regra 20%: `valorImovel>0 && entrada>=valorImovel*0.2 && entrada<valorImovel`
- *   → `valorImovel-entrada`, senão `null`).
+ * Caracterização: trava o comportamento dos derivados de UI
+ * (cruzamento SAC/Price, % economia, principal, taxa anual,
+ * rótulo de prazo, % entrada, preview do financiado).
  */
 import { describe, it, expect } from 'vitest';
 import {

@@ -88,6 +88,72 @@ describe('useFormCalculator', () => {
     expect(result.current.errors.taxaJuros).toBe('Taxa de juros máxima de 20% ao mês');
   });
 
+  it('deve rejeitar entrada igual ou acima do valor do imóvel (borda)', () => {
+    const { result } = renderHook(() => useFormCalculator());
+
+    act(() => {
+      result.current.handleChange('valorImovel', '10000000');
+    });
+    act(() => {
+      result.current.handleChange('entrada', '10000000');
+    });
+    act(() => {
+      result.current.handleChange('taxaJuros', '85');
+    });
+    act(() => {
+      result.current.handleChange('prazoMeses', '360');
+    });
+    act(() => {
+      result.current.handleBlur('entrada');
+    });
+
+    expect(result.current.isValid).toBe(false);
+    expect(result.current.errors.entrada).toBe('Entrada deve ser menor que o valor do imóvel');
+
+    act(() => {
+      result.current.handleChange('entrada', '12000000');
+    });
+    act(() => {
+      result.current.handleBlur('entrada');
+    });
+
+    expect(result.current.errors.entrada).toBe('Entrada deve ser menor que o valor do imóvel');
+  });
+
+  it('deve rejeitar prazo acima de 600 meses e exigir valor do imóvel (bordas)', () => {
+    const { result } = renderHook(() => useFormCalculator());
+
+    act(() => {
+      result.current.handleChange('valorImovel', '30000000');
+    });
+    act(() => {
+      result.current.handleChange('entrada', '6000000');
+    });
+    act(() => {
+      result.current.handleChange('taxaJuros', '85');
+    });
+    act(() => {
+      result.current.handleChange('prazoMeses', '601');
+    });
+    act(() => {
+      result.current.handleBlur('prazoMeses');
+    });
+
+    expect(result.current.isValid).toBe(false);
+    expect(result.current.errors.prazoMeses).toBe('Prazo máximo de 600 meses');
+  });
+
+  it('deve exigir valor do imóvel maior que zero quando vazio (borda valor<=0)', () => {
+    const { result } = renderHook(() => useFormCalculator());
+
+    act(() => {
+      result.current.handleBlur('valorImovel');
+    });
+
+    expect(result.current.isValid).toBe(false);
+    expect(result.current.errors.valorImovel).toBe('Valor do imóvel deve ser maior que zero');
+  });
+
   it('deve chamar onSubmit com dados numéricos quando válido', () => {
     const onSubmit = vi.fn();
     const { result } = renderHook(() => useFormCalculator());

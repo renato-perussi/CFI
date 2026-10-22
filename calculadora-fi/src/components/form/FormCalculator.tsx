@@ -12,25 +12,12 @@ import {
   formatarPrazoEmAnos,
   calcularValorFinanciadoPreview,
 } from '../../utils/analise';
+import { ENTRADAS_SUGERIDAS, PRAZOS_SUGERIDOS } from '../../constants/negocio';
 import type { Financiamento } from '../../types/financiamento';
 
 interface FormCalculatorProps {
   onSubmit: (financiamento: Financiamento) => void;
 }
-
-const ENTRADAS_SUGERIDAS = [
-  { percentual: 20, rotulo: '20% (Mín.)' },
-  { percentual: 30, rotulo: '30%' },
-  { percentual: 40, rotulo: '40%' },
-  { percentual: 50, rotulo: '50%' },
-];
-
-const PRAZOS_SUGERIDOS = [
-  { meses: '120', rotulo: '120m (10a)' },
-  { meses: '240', rotulo: '240m (20a)' },
-  { meses: '360', rotulo: '360m (30a)' },
-  { meses: '420', rotulo: '420m (35a)' },
-];
 
 export function FormCalculator({ onSubmit }: FormCalculatorProps) {
   const { values, errors, isValid, handleChange, handleBlur, handleSubmit } = useFormCalculator();

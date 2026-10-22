@@ -2,8 +2,7 @@ import { useState, useMemo } from 'react';
 import type { Parcela } from '../../types/financiamento';
 import { formatarMoeda } from '../../utils/format';
 import { Paginacao } from '../ui/Paginacao';
-
-const ITENS_POR_PAGINA = 20;
+import { ITENS_POR_PAGINA } from '../../constants/negocio';
 
 interface TabelaAmortizacaoProps {
   titulo: string;

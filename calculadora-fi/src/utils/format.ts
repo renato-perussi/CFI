@@ -68,18 +68,8 @@ export function formatarEntradaPrazo(valor: string): string {
 }
 
 /**
- * Sprint 15 — Parsing Único (RFR-003).
- *
- * Inversas exatas das máscaras `/100` (`formatarEntradaMoeda` /
- * `formatarEntradaPercentual`). Centralizam todo o parsing de moeda/percentual
- * do app: fora deste arquivo não deve existir parsing manual de ponto de
- * milhar (critério S15-02, verificado via `rg`).
- *
- * - `''` (campo vazio) → `NaN`. Chamadores convertem com `|| 0` quando
- *   precisam de zero (ex.: previews) ou checam `!campo`/`isNaN` antes
- *   (ex.: validação — `'Campo obrigatório'`). O `NaN` é o que a Sprint 16
- *   (`domain/validacao.ts`) espera para campo vazio.
- * - `'0,00'` → `0`.
+ * Inversas exatas das máscaras `/100`: todo o parsing de moeda/percentual
+ * do app passa por aqui. `''` (campo vazio) → `NaN`; `'0,00'` → `0`.
  */
 export function parseMoedaParaNumero(valor: string): number {
   if (!valor) return NaN;
@@ -92,13 +82,8 @@ export function parsePercentualParaNumero(valor: string): number {
 }
 
 /**
- * Sprint 15 — Formatação percentual central (RFR-003).
- *
- * Substitui os `toLocaleString('pt-BR', …)` ad-hoc espalhados por
- * `analise.ts`/componentes. `casas` é o máximo de casas decimais;
- * `minimo` (padrão = `casas`) é o mínimo — necessário porque os
- * comportamentos travados divergem: economia exige mín 1 (`"10,0"`,
- * `ComparacaoFinanciamento`), entrada exige mín 0 (`"20%"`, `FormCalculator`).
+ * Percentual pt-BR: `casas` = máximo de decimais, `minimo` (padrão = `casas`)
+ * = mínimo (economia usa mín 1, `"10,0"`; entrada usa mín 0, `"20%"`).
  */
 export function formatarPercentual(valor: number, casas = 1, minimo: number = casas): string {
   return valor.toLocaleString('pt-BR', {

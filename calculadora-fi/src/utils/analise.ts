@@ -1,28 +1,12 @@
 /**
- * Sprint 14 — Derivados Puros (RFR-002).
- *
- * Lógica derivada extraída dos componentes de UI para funções puras testadas.
- * Núcleo `calculos.ts` intocado. Todas as funções recebem NÚMEROS já parseados
- * (a máscara continua resolvida na UI via `format.ts` até a Sprint 15) e nunca
- * tocam em estado React (`useMemo` fica no componente, se necessário).
- *
- * Fontes (extração verbatim, sem mudança de comportamento):
- * - `calcularMesCruzamento` ← `ComparacaoFinanciamento.tsx:19-28`
- * - `calcularPercentualEconomia` ← `ComparacaoFinanciamento.tsx:30-37`
- * - `calcularValorPrincipal` ← `ResultadoHeader.tsx:19-25`
- * - `calcularTaxaAnualEquivalente`, `formatarPrazoEmAnos`,
- *   `calcularPercentualEntrada`, `calcularValorFinanciadoPreview`
- *   ← `FormCalculator.tsx:34-62`
- *
- * Sprint 15 (RFR-003): formatação percentual centralizada via
- * `formatarPercentual` de `format.ts` (sem mudança de outputs travados).
+ * Derivados de UI em funções puras testadas. Recebem números já parseados;
+ * sem estado React. Núcleo `calculos.ts` intocado.
  */
 import type { Parcela } from '../types/financiamento';
 import { formatarPercentual } from './format';
 
 /**
- * S14-01 — Mês em que a parcela SAC cruza para baixo da Price.
- * Scan linear; `null` quando SAC nunca fica menor ou igual (ou tabelas vazias).
+ * Mês em que a parcela SAC cruza para baixo da Price (`null` se nunca cruzar).
  */
 export function calcularMesCruzamento(tabelaSAC: Parcela[], tabelaPrice: Parcela[]): number | null {
   for (let i = 0; i < tabelaSAC.length; i++) {
@@ -35,33 +19,24 @@ export function calcularMesCruzamento(tabelaSAC: Parcela[], tabelaPrice: Parcela
   return null;
 }
 
-/**
- * S14-02 — Percentual de economia formatado pt-BR com 1 casa (`"X,X"`).
- * Guarda divisão por zero: `maiorTotal <= 0` → `'0,0'`.
- */
+/** Percentual de economia pt-BR com 1 casa; `maiorTotal <= 0` → `'0,0'`. */
 export function calcularPercentualEconomia(economia: number, maiorTotal: number): string {
   return maiorTotal > 0 ? formatarPercentual((economia / maiorTotal) * 100) : '0,0';
 }
 
-/**
- * S14-02 — Valor principal recomposto (`totalPago - totalJuros`, 2 casas).
- * Trava em `0`: nunca retorna negativo.
- */
+/** Valor principal recomposto (`totalPago - totalJuros`, nunca negativo). */
 export function calcularValorPrincipal(totalPago: number, totalJuros: number): number {
   return Math.max(Number((totalPago - totalJuros).toFixed(2)), 0);
 }
 
-/**
- * S14-03 — Taxa anual equivalente (`(1+m/100)^12 - 1`) formatada
- * pt-BR com 2 casas (`"≈ X,XX% a.a."`); taxa zerada → `'Taxa efetiva'`.
- */
+/** Taxa anual equivalente (`"≈ X,XX% a.a."`); zerada → `'Taxa efetiva'`. */
 export function calcularTaxaAnualEquivalente(taxaMensal: number): string {
   return taxaMensal > 0
     ? `≈ ${formatarPercentual((Math.pow(1 + taxaMensal / 100, 12) - 1) * 100, 2)}% a.a.`
     : 'Taxa efetiva';
 }
 
-/** S14-03 — Rótulo do prazo: meses, anos redondos ou `"Xa Ym"`; `<= 0` → hint de máximo. */
+/** Rótulo do prazo: meses, anos redondos ou `"Xa Ym"`; `<= 0` → hint de máximo. */
 export function formatarPrazoEmAnos(prazoMeses: number): string {
   if (prazoMeses <= 0) return 'Máx. 600 meses';
   const anos = Math.floor(prazoMeses / 12);
@@ -71,21 +46,14 @@ export function formatarPrazoEmAnos(prazoMeses: number): string {
   return `${anos}a ${mesesRestantes}m`;
 }
 
-/**
- * S14-03 — Percentual da entrada sobre o valor do imóvel
- * (`"X% do imóvel"`, pt-BR 0–1 casa); valores inválidos → `'Mín. 20%'`.
- */
+/** Percentual da entrada (`"X% do imóvel"`); inválidos → `'Mín. 20%'`. */
 export function calcularPercentualEntrada(valorImovel: number, entrada: number): string {
   return valorImovel > 0 && entrada > 0
     ? `${formatarPercentual((entrada / valorImovel) * 100, 1, 0)}% do imóvel`
     : 'Mín. 20%';
 }
 
-/**
- * S14-03 — Preview do valor a financiar (`valorImovel - entrada`).
- * Regra dos 20%: `valorImovel > 0 && entrada >= 20% && entrada < valorImovel`;
- * fora da regra → `null` (preview oculto).
- */
+/** Preview do valor a financiar; fora da regra de 20% → `null`. */
 export function calcularValorFinanciadoPreview(
   valorImovel: number,
   entrada: number
