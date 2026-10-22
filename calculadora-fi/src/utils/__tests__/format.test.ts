@@ -6,6 +6,9 @@ import {
   formatarEntradaMoeda,
   formatarEntradaPercentual,
   formatarEntradaPrazo,
+  parseMoedaParaNumero,
+  parsePercentualParaNumero,
+  formatarPercentual,
 } from '../format';
 
 describe('formatarMoeda', () => {
@@ -70,5 +73,74 @@ describe('formatarEntradaPrazo', () => {
     expect(formatarEntradaPrazo('036')).toBe('36');
     expect(formatarEntradaPrazo('000')).toBe('');
     expect(formatarEntradaPrazo('abc120')).toBe('120');
+  });
+});
+
+describe('parseMoedaParaNumero (Sprint 15 — inversa exata da máscara /100)', () => {
+  it('deve converter moeda mascarada pt-BR em número', () => {
+    expect(parseMoedaParaNumero('300.000,00')).toBe(300000);
+    expect(parseMoedaParaNumero('60.000,00')).toBe(60000);
+    expect(parseMoedaParaNumero('1.500,50')).toBe(1500.5);
+  });
+
+  it('deve retornar 0 para "0,00"', () => {
+    expect(parseMoedaParaNumero('0,00')).toBe(0);
+  });
+
+  it('deve retornar NaN para string vazia (campo vazio)', () => {
+    expect(parseMoedaParaNumero('')).toBeNaN();
+  });
+
+  it('round-trip: máscara → parse recompõe o valor original', () => {
+    expect(parseMoedaParaNumero(formatarEntradaMoeda('30000000'))).toBe(300000);
+    expect(parseMoedaParaNumero(formatarEntradaMoeda('6000000'))).toBe(60000);
+  });
+});
+
+describe('parsePercentualParaNumero (Sprint 15 — inversa exata da máscara /100)', () => {
+  it('deve converter percentual mascarado pt-BR em número', () => {
+    expect(parsePercentualParaNumero('0,85')).toBe(0.85);
+    expect(parsePercentualParaNumero('1,25')).toBe(1.25);
+  });
+
+  it('deve aceitar dígitos crus com zero à esquerda (085 → 0,85 mascarado)', () => {
+    expect(formatarEntradaPercentual('085')).toBe('0,85');
+    expect(parsePercentualParaNumero(formatarEntradaPercentual('085'))).toBe(0.85);
+  });
+
+  it('deve retornar 0 para "0,00"', () => {
+    expect(parsePercentualParaNumero('0,00')).toBe(0);
+  });
+
+  it('deve retornar NaN para string vazia (campo vazio)', () => {
+    expect(parsePercentualParaNumero('')).toBeNaN();
+  });
+
+  it('round-trip: máscara → parse recompõe o valor original', () => {
+    expect(parsePercentualParaNumero(formatarEntradaPercentual('85'))).toBe(0.85);
+    expect(parsePercentualParaNumero(formatarEntradaPercentual('125'))).toBe(1.25);
+  });
+});
+
+describe('formatarPercentual (Sprint 15 — formatação percentual central)', () => {
+  it('padrão 1 casa com mínimo 1 (economia: 4,3 / 10,0 / 0,0)', () => {
+    expect(formatarPercentual(4.3478)).toBe('4,3');
+    expect(formatarPercentual(10)).toBe('10,0');
+    expect(formatarPercentual(0)).toBe('0,0');
+  });
+
+  it('2 casas (taxa anual: 10,69)', () => {
+    expect(formatarPercentual(10.6907, 2)).toBe('10,69');
+    expect(formatarPercentual(12.6825, 2)).toBe('12,68');
+  });
+
+  it('0 casas sem agrupar (preview: 80)', () => {
+    expect(formatarPercentual(80, 0)).toBe('80');
+    expect(formatarPercentual(33.333, 0)).toBe('33');
+  });
+
+  it('mínimo 0 com máximo 1 (entrada: 20 / 33,3)', () => {
+    expect(formatarPercentual(20, 1, 0)).toBe('20');
+    expect(formatarPercentual(33.333, 1, 0)).toBe('33,3');
   });
 });

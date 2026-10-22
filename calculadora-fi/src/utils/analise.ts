@@ -13,8 +13,12 @@
  * - `calcularTaxaAnualEquivalente`, `formatarPrazoEmAnos`,
  *   `calcularPercentualEntrada`, `calcularValorFinanciadoPreview`
  *   ← `FormCalculator.tsx:34-62`
+ *
+ * Sprint 15 (RFR-003): formatação percentual centralizada via
+ * `formatarPercentual` de `format.ts` (sem mudança de outputs travados).
  */
 import type { Parcela } from '../types/financiamento';
+import { formatarPercentual } from './format';
 
 /**
  * S14-01 — Mês em que a parcela SAC cruza para baixo da Price.
@@ -36,12 +40,7 @@ export function calcularMesCruzamento(tabelaSAC: Parcela[], tabelaPrice: Parcela
  * Guarda divisão por zero: `maiorTotal <= 0` → `'0,0'`.
  */
 export function calcularPercentualEconomia(economia: number, maiorTotal: number): string {
-  return maiorTotal > 0
-    ? ((economia / maiorTotal) * 100).toLocaleString('pt-BR', {
-        minimumFractionDigits: 1,
-        maximumFractionDigits: 1,
-      })
-    : '0,0';
+  return maiorTotal > 0 ? formatarPercentual((economia / maiorTotal) * 100) : '0,0';
 }
 
 /**
@@ -58,10 +57,7 @@ export function calcularValorPrincipal(totalPago: number, totalJuros: number): n
  */
 export function calcularTaxaAnualEquivalente(taxaMensal: number): string {
   return taxaMensal > 0
-    ? `≈ ${((Math.pow(1 + taxaMensal / 100, 12) - 1) * 100).toLocaleString('pt-BR', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })}% a.a.`
+    ? `≈ ${formatarPercentual((Math.pow(1 + taxaMensal / 100, 12) - 1) * 100, 2)}% a.a.`
     : 'Taxa efetiva';
 }
 
@@ -81,10 +77,7 @@ export function formatarPrazoEmAnos(prazoMeses: number): string {
  */
 export function calcularPercentualEntrada(valorImovel: number, entrada: number): string {
   return valorImovel > 0 && entrada > 0
-    ? `${((entrada / valorImovel) * 100).toLocaleString('pt-BR', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 1,
-      })}% do imóvel`
+    ? `${formatarPercentual((entrada / valorImovel) * 100, 1, 0)}% do imóvel`
     : 'Mín. 20%';
 }
 

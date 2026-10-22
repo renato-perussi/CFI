@@ -1,6 +1,11 @@
 import { FormField } from '../ui/FormField';
 import { useFormCalculator } from '../../hooks/useFormCalculator';
-import { formatarMoeda } from '../../utils/format';
+import {
+  formatarMoeda,
+  formatarPercentual,
+  parseMoedaParaNumero,
+  parsePercentualParaNumero,
+} from '../../utils/format';
 import {
   calcularPercentualEntrada,
   calcularTaxaAnualEquivalente,
@@ -32,9 +37,9 @@ export function FormCalculator({ onSubmit }: FormCalculatorProps) {
 
   const handleFormSubmit = handleSubmit(onSubmit);
 
-  const valorImovelNum = parseFloat(values.valorImovel.replace(/\./g, '').replace(',', '.')) || 0;
-  const entradaNum = parseFloat(values.entrada.replace(/\./g, '').replace(',', '.')) || 0;
-  const taxaMensalNum = parseFloat(values.taxaJuros.replace(',', '.')) || 0;
+  const valorImovelNum = parseMoedaParaNumero(values.valorImovel) || 0;
+  const entradaNum = parseMoedaParaNumero(values.entrada) || 0;
+  const taxaMensalNum = parsePercentualParaNumero(values.taxaJuros) || 0;
   const prazoNum = parseInt(values.prazoMeses, 10) || 0;
 
   const percentualEntrada = calcularPercentualEntrada(valorImovelNum, entradaNum);
@@ -170,7 +175,7 @@ export function FormCalculator({ onSubmit }: FormCalculatorProps) {
               {formatarMoeda(valorFinanciadoPreview)}
             </span>
             <span className="text-xs font-medium text-slate-500 tabular-nums">
-              ({((valorFinanciadoPreview / valorImovelNum) * 100).toFixed(0)}% do imóvel)
+              ({formatarPercentual((valorFinanciadoPreview / valorImovelNum) * 100, 0)}% do imóvel)
             </span>
           </div>
         </div>

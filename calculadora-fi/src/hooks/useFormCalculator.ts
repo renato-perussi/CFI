@@ -4,6 +4,8 @@ import {
   formatarEntradaMoeda,
   formatarEntradaPercentual,
   formatarEntradaPrazo,
+  parseMoedaParaNumero,
+  parsePercentualParaNumero,
 } from '../utils/format';
 
 export interface FormErrors {
@@ -34,9 +36,9 @@ export function useFormCalculator() {
   const validate = useCallback((vals: FormValues): FormErrors => {
     const newErrors: FormErrors = {};
 
-    const valorImovel = parseFloat(vals.valorImovel.replace(/\./g, '').replace(',', '.'));
-    const entrada = parseFloat(vals.entrada.replace(/\./g, '').replace(',', '.'));
-    const taxaJuros = parseFloat(vals.taxaJuros.replace(',', '.'));
+    const valorImovel = parseMoedaParaNumero(vals.valorImovel);
+    const entrada = parseMoedaParaNumero(vals.entrada);
+    const taxaJuros = parsePercentualParaNumero(vals.taxaJuros);
     const prazoMeses = parseInt(vals.prazoMeses, 10);
 
     if (!vals.valorImovel || isNaN(valorImovel) || valorImovel <= 0) {
@@ -154,9 +156,9 @@ export function useFormCalculator() {
   const getFinanciamento = useCallback((): Financiamento | null => {
     if (!validateAll()) return null;
 
-    const valorImovel = parseFloat(values.valorImovel.replace(/\./g, '').replace(',', '.'));
-    const entrada = parseFloat(values.entrada.replace(/\./g, '').replace(',', '.')) || 0;
-    const taxaJuros = parseFloat(values.taxaJuros.replace(',', '.'));
+    const valorImovel = parseMoedaParaNumero(values.valorImovel);
+    const entrada = parseMoedaParaNumero(values.entrada) || 0;
+    const taxaJuros = parsePercentualParaNumero(values.taxaJuros);
     const prazoMeses = parseInt(values.prazoMeses, 10);
 
     return {
