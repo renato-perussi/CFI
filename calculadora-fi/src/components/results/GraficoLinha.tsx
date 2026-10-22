@@ -1,3 +1,4 @@
+import { memo, useMemo } from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -11,7 +12,7 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import type { Resultado } from '../../types/financiamento';
-import { formatarMoeda, formatarNumero } from '../../utils/format';
+import { formatarMoeda, formatarMoedaCompacta, formatarNumero } from '../../utils/format';
 
 ChartJS.register(
   CategoryScale,
@@ -34,12 +35,12 @@ interface GraficoLinhaProps {
   resultadoPrice: Resultado;
 }
 
-const COR_SAC = '#16a34a';
-const COR_SAC_BG = 'rgba(22, 163, 74, 0.1)';
+const COR_SAC = '#059669';
+const COR_SAC_BG = 'rgba(5, 150, 105, 0.08)';
 const COR_PRICE = '#2563eb';
-const COR_PRICE_BG = 'rgba(37, 99, 235, 0.1)';
+const COR_PRICE_BG = 'rgba(37, 99, 235, 0.08)';
 
-export function GraficoLinha({
+export const GraficoLinha = memo(function GraficoLinha({
   titulo,
   rotuloEixoY,
   rotuloSAC,
@@ -48,133 +49,146 @@ export function GraficoLinha({
   resultadoSAC,
   resultadoPrice,
 }: GraficoLinhaProps) {
-  const labels = resultadoSAC.tabela.map((p) => formatarNumero(p.mes));
+  const data = useMemo(() => {
+    const labels = resultadoSAC.tabela.map((p) => formatarNumero(p.mes));
 
-  const data = {
-    labels,
-    datasets: [
-      {
-        label: rotuloSAC,
-        data: resultadoSAC.tabela.map((p) => p[campoDados]),
-        borderColor: COR_SAC,
-        backgroundColor: COR_SAC_BG,
-        borderWidth: 2,
-        pointRadius: 0,
-        pointHoverRadius: 5,
-        pointHoverBackgroundColor: COR_SAC,
-        pointHoverBorderColor: '#fff',
-        pointHoverBorderWidth: 2,
-        tension: 0.3,
-        fill: true,
-      },
-      {
-        label: rotuloPrice,
-        data: resultadoPrice.tabela.map((p) => p[campoDados]),
-        borderColor: COR_PRICE,
-        backgroundColor: COR_PRICE_BG,
-        borderWidth: 2,
-        pointRadius: 0,
-        pointHoverRadius: 5,
-        pointHoverBackgroundColor: COR_PRICE,
-        pointHoverBorderColor: '#fff',
-        pointHoverBorderWidth: 2,
-        tension: 0.3,
-        fill: true,
-      },
-    ],
-  };
+    return {
+      labels,
+      datasets: [
+        {
+          label: rotuloSAC,
+          data: resultadoSAC.tabela.map((p) => p[campoDados]),
+          borderColor: COR_SAC,
+          backgroundColor: COR_SAC_BG,
+          borderWidth: 2.25,
+          pointRadius: 0,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: COR_SAC,
+          pointHoverBorderColor: '#fff',
+          pointHoverBorderWidth: 2,
+          tension: 0.25,
+          fill: true,
+        },
+        {
+          label: rotuloPrice,
+          data: resultadoPrice.tabela.map((p) => p[campoDados]),
+          borderColor: COR_PRICE,
+          backgroundColor: COR_PRICE_BG,
+          borderWidth: 2.25,
+          pointRadius: 0,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: COR_PRICE,
+          pointHoverBorderColor: '#fff',
+          pointHoverBorderWidth: 2,
+          tension: 0.25,
+          fill: true,
+        },
+      ],
+    };
+  }, [resultadoSAC, resultadoPrice, campoDados, rotuloSAC, rotuloPrice]);
 
-  const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    interaction: {
-      mode: 'index' as const,
-      intersect: false,
-    },
-    plugins: {
-      legend: {
-        position: 'top' as const,
-        labels: {
-          usePointStyle: true,
-          pointStyle: 'circle',
-          padding: 20,
-          font: {
-            size: 13,
-            weight: 600,
-          },
-        },
+  const options = useMemo(
+    () => ({
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: 'index' as const,
+        intersect: false,
       },
-      title: {
-        display: true,
-        text: titulo,
-        font: {
-          size: 16,
-          weight: 700,
-        },
-        color: '#1f2937',
-        padding: { bottom: 16 },
-      },
-      tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.85)',
-        titleFont: { size: 13, weight: 600 },
-        bodyFont: { size: 12 },
-        padding: 12,
-        cornerRadius: 8,
-        displayColors: true,
-        boxWidth: 10,
-        boxHeight: 10,
-        boxPadding: 4,
-        callbacks: {
-          title: (items: Array<{ label: string }>) => `Mês ${items[0].label}`,
-          label: (context: { dataset: { label?: string }; parsed: { y: number | null } }) => {
-            const valor = context.parsed.y;
-            if (valor === null) return '';
-            return ` ${context.dataset.label}: ${formatarMoeda(valor)}`;
-          },
-        },
-      },
-    },
-    scales: {
-      x: {
-        title: {
-          display: true,
-          text: 'Mês',
-          font: { size: 12, weight: 600 },
-          color: '#6b7280',
-        },
-        ticks: {
-          maxTicksLimit: 12,
-          font: { size: 11 },
-          color: '#6b7280',
-        },
-        grid: {
+      plugins: {
+        legend: {
           display: false,
         },
-      },
-      y: {
         title: {
-          display: true,
-          text: rotuloEixoY,
-          font: { size: 12, weight: 600 },
-          color: '#6b7280',
+          display: false,
         },
-        ticks: {
-          font: { size: 11 },
-          color: '#6b7280',
-          callback: (valor: number | string) => formatarMoeda(Number(valor)),
-        },
-        grid: {
-          color: 'rgba(0, 0, 0, 0.06)',
+        tooltip: {
+          backgroundColor: '#0f172a',
+          titleFont: { family: 'Inter, sans-serif', size: 12, weight: 600 },
+          bodyFont: { family: 'Inter, sans-serif', size: 12 },
+          padding: 12,
+          cornerRadius: 10,
+          displayColors: true,
+          boxWidth: 8,
+          boxHeight: 8,
+          boxPadding: 6,
+          callbacks: {
+            title: (items: Array<{ label: string }>) => `Mês ${items[0].label}`,
+            label: (context: { dataset: { label?: string }; parsed: { y: number | null } }) => {
+              const valor = context.parsed.y;
+              if (valor === null) return '';
+              return ` ${context.dataset.label}: ${formatarMoeda(valor)}`;
+            },
+          },
         },
       },
-    },
-  };
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: 'Mês do Financiamento',
+            font: { family: 'Inter, sans-serif', size: 11, weight: 500 },
+            color: '#64748b',
+            padding: { top: 6 },
+          },
+          ticks: {
+            maxTicksLimit: 8,
+            maxRotation: 0,
+            font: { family: 'Inter, sans-serif', size: 11 },
+            color: '#64748b',
+          },
+          grid: {
+            display: false,
+          },
+          border: {
+            color: '#e2e8f0',
+          },
+        },
+        y: {
+          title: {
+            display: false,
+          },
+          ticks: {
+            maxTicksLimit: 6,
+            font: { family: 'Inter, sans-serif', size: 11 },
+            color: '#64748b',
+            callback: (valor: number | string) => formatarMoedaCompacta(Number(valor)),
+          },
+          grid: {
+            color: '#f1f5f9',
+          },
+          border: {
+            display: false,
+          },
+        },
+      },
+    }),
+    []
+  );
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-6 md:p-8">
-      <div className="h-[320px] sm:h-[380px] md:h-[420px]">
+    <div className="h-full bg-white rounded-2xl shadow-xs border border-slate-200/90 p-5 sm:p-6 flex flex-col justify-between">
+      <div className="flex flex-col gap-2 mb-4 pb-3 border-b border-slate-100">
+        <div className="flex items-center justify-between gap-2">
+          <h4 className="text-sm sm:text-base font-bold text-slate-900 truncate">{titulo}</h4>
+          <span className="text-xs text-slate-400 shrink-0 hidden sm:inline">{rotuloEixoY}</span>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-4 text-xs font-semibold text-slate-600">
+          <span className="inline-flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" aria-hidden="true" />
+            {rotuloSAC}
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-blue-600" aria-hidden="true" />
+            {rotuloPrice}
+          </span>
+        </div>
+      </div>
+
+      <div className="h-[240px] sm:h-[280px]">
         <Line data={data} options={options} />
       </div>
     </div>
   );
-}
+});

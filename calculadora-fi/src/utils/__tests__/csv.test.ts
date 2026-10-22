@@ -90,10 +90,16 @@ describe('downloadCSV', () => {
       click: clickSpy,
     } as unknown as HTMLAnchorElement);
 
-    vi.spyOn(document.body, 'appendChild').mockImplementation(appendChildSpy as (node: Node) => Node);
-    vi.spyOn(document.body, 'removeChild').mockImplementation(removeChildSpy as (child: Node) => Node);
+    vi.spyOn(document.body, 'appendChild').mockImplementation(
+      appendChildSpy as (node: Node) => Node
+    );
+    vi.spyOn(document.body, 'removeChild').mockImplementation(
+      removeChildSpy as (child: Node) => Node
+    );
     vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:mock-url');
-    vi.spyOn(URL, 'revokeObjectURL').mockImplementation(revokeObjectURLSpy as (url: string) => void);
+    vi.spyOn(URL, 'revokeObjectURL').mockImplementation(
+      revokeObjectURLSpy as (url: string) => void
+    );
   });
 
   afterEach(() => {

@@ -10,13 +10,18 @@ describe('calcularSAC', () => {
     expect(resultado.parcelaInicial).toBeGreaterThan(resultado.parcelaFinal);
   });
 
-  it('deve manter amortização constante em todas as parcelas', () => {
+  it('deve manter amortização constante nas parcelas e ajustar resíduo de centavos na última', () => {
     const resultado = calcularSAC(100000, 1, 12);
     const amortizacaoEsperada = Number((100000 / 12).toFixed(2));
 
-    for (const parcela of resultado.tabela) {
+    for (const parcela of resultado.tabela.slice(0, -1)) {
       expect(parcela.amortizacao).toBe(amortizacaoEsperada);
     }
+
+    const somaAmortizacoes = Number(
+      resultado.tabela.reduce((acc, p) => acc + p.amortizacao, 0).toFixed(2)
+    );
+    expect(somaAmortizacoes).toBe(100000);
   });
 
   it('deve calcular juros sobre saldo devedor', () => {
@@ -52,14 +57,19 @@ describe('calcularSAC', () => {
 });
 
 describe('calcularPrice', () => {
-  it('deve calcular parcelas de valor fixo', () => {
+  it('deve calcular parcelas de valor fixo e ajustar resíduo de centavos na última', () => {
     const resultado = calcularPrice(100000, 1, 12);
 
     expect(resultado.tabela).toHaveLength(12);
 
-    for (const parcela of resultado.tabela) {
+    for (const parcela of resultado.tabela.slice(0, -1)) {
       expect(parcela.parcela).toBe(resultado.parcelaInicial);
     }
+
+    const somaAmortizacoes = Number(
+      resultado.tabela.reduce((acc, p) => acc + p.amortizacao, 0).toFixed(2)
+    );
+    expect(somaAmortizacoes).toBe(100000);
   });
 
   it('deve calcular juros decrescentes e amortização crescente', () => {
@@ -227,8 +237,23 @@ describe('integração SAC vs Price', () => {
 
       expect(sac.tabela).toHaveLength(cenario.prazo);
       expect(price.tabela).toHaveLength(cenario.prazo);
-      expect(sac.totalPago).toBeCloseTo(sac.totalJuros + cenario.valor, -1);
-      expect(price.totalPago).toBeCloseTo(price.totalJuros + cenario.valor, -1);
+      expect(Number((sac.totalPago - sac.totalJuros).toFixed(2))).toBe(cenario.valor);
+      expect(Number((price.totalPago - price.totalJuros).toFixed(2))).toBe(cenario.valor);
+
+      for (const p of sac.tabela) {
+        expect(Number((p.amortizacao + p.juros).toFixed(2))).toBe(p.parcela);
+      }
+      for (const p of price.tabela) {
+        expect(Number((p.amortizacao + p.juros).toFixed(2))).toBe(p.parcela);
+      }
     }
+  });
+
+  it('não deve gerar NaN ou Infinity na Tabela Price com taxas extremas', () => {
+    const resultado = calcularPrice(100000, 250, 600);
+
+    expect(Number.isFinite(resultado.totalPago)).toBe(true);
+    expect(Number.isFinite(resultado.totalJuros)).toBe(true);
+    expect(Number.isFinite(resultado.parcelaInicial)).toBe(true);
   });
 });

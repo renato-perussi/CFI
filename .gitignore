@@ -1,8 +1,3 @@
-# Ignore markdown files
-PRD.md
-SPRINTS.md
-agents/
-
 # Dependencies
 node_modules/
 .pnp

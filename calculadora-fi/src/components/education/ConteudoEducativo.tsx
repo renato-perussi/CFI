@@ -76,65 +76,75 @@ export function ConteudoEducativo() {
   const [abaAtiva, setAbaAtiva] = useState<AbaEducacao>('sac');
 
   return (
-    <section className="mt-12" aria-labelledby="educacao-titulo">
-      <h2 id="educacao-titulo" className="text-2xl font-semibold text-gray-800 mb-2">
-        Entenda os Sistemas de Financiamento
-      </h2>
-      <p className="text-gray-600 mb-6">
-        Conheça as diferenças entre SAC e Price para tomar a melhor decisão.
-      </p>
+    <section className="pt-4" aria-labelledby="educacao-titulo">
+      <div className="mb-5">
+        <span className="text-xs font-bold uppercase tracking-wider text-blue-600 block mb-1">
+          Guia de Decisão
+        </span>
+        <h2 id="educacao-titulo" className="text-xl sm:text-2xl font-bold text-slate-900">
+          Entenda os Sistemas de Financiamento
+        </h2>
+        <p className="text-sm sm:text-base text-slate-600 mt-1">
+          Conheça as diferenças estruturais entre SAC e Price para tomar a melhor decisão.
+        </p>
+      </div>
 
-      <div className="bg-white rounded-xl shadow-md overflow-hidden">
-        <div
-          className="flex border-b border-gray-200"
-          role="tablist"
-          aria-label="Conteúdo educativo"
-        >
-          <button
-            type="button"
-            role="tab"
-            aria-selected={abaAtiva === 'sac'}
-            aria-controls="painel-sac"
-            onClick={() => setAbaAtiva('sac')}
-            className={`flex-1 px-4 py-3 text-sm font-semibold transition-all duration-300 ${
-              abaAtiva === 'sac'
-                ? 'text-green-700 border-b-2 border-green-600 bg-green-50'
-                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-            }`}
+      <div className="bg-white rounded-2xl shadow-xs border border-slate-200/90 overflow-hidden">
+        <div className="p-2 sm:p-3 bg-slate-50 border-b border-slate-200/80">
+          <div
+            className="grid grid-cols-3 gap-1 bg-slate-200/70 p-1 rounded-xl"
+            role="tablist"
+            aria-label="Conteúdo educativo"
           >
-            SAC
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={abaAtiva === 'price'}
-            aria-controls="painel-price"
-            onClick={() => setAbaAtiva('price')}
-            className={`flex-1 px-4 py-3 text-sm font-semibold transition-all duration-300 ${
-              abaAtiva === 'price'
-                ? 'text-blue-700 border-b-2 border-blue-600 bg-blue-50'
-                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-            }`}
-          >
-            Price
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={abaAtiva === 'comparacao'}
-            aria-controls="painel-comparacao"
-            onClick={() => setAbaAtiva('comparacao')}
-            className={`flex-1 px-4 py-3 text-sm font-semibold transition-all duration-300 ${
-              abaAtiva === 'comparacao'
-                ? 'text-purple-700 border-b-2 border-purple-600 bg-purple-50'
-                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-            }`}
-          >
-            Comparação
-          </button>
+            <button
+              type="button"
+              id="tab-sac"
+              role="tab"
+              aria-selected={abaAtiva === 'sac'}
+              aria-controls="painel-sac"
+              onClick={() => setAbaAtiva('sac')}
+              className={`px-2 sm:px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-200 cursor-pointer ${
+                abaAtiva === 'sac'
+                  ? 'bg-white text-emerald-700 shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              SAC
+            </button>
+            <button
+              type="button"
+              id="tab-price"
+              role="tab"
+              aria-selected={abaAtiva === 'price'}
+              aria-controls="painel-price"
+              onClick={() => setAbaAtiva('price')}
+              className={`px-2 sm:px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-200 cursor-pointer ${
+                abaAtiva === 'price'
+                  ? 'bg-white text-blue-700 shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Price
+            </button>
+            <button
+              type="button"
+              id="tab-comparacao"
+              role="tab"
+              aria-selected={abaAtiva === 'comparacao'}
+              aria-controls="painel-comparacao"
+              onClick={() => setAbaAtiva('comparacao')}
+              className={`px-2 sm:px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-200 cursor-pointer ${
+                abaAtiva === 'comparacao'
+                  ? 'bg-white text-slate-900 shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Comparação
+            </button>
+          </div>
         </div>
 
-        <div className="p-6">
+        <div className="p-5 sm:p-8">
           <div key={abaAtiva} className="animate-fadeIn">
             {abaAtiva === 'sac' && <PainelSAC />}
             {abaAtiva === 'price' && <PainelPrice />}
@@ -151,17 +161,28 @@ function PainelSAC() {
 
   return (
     <div id="painel-sac" role="tabpanel" aria-labelledby="tab-sac">
-      <div className="mb-4">
-        <h3 className="text-lg font-bold text-green-700">{sac.titulo}</h3>
-        <p className="text-sm text-gray-500">{sac.subtitulo}</p>
+      <div className="flex items-center gap-3 mb-4">
+        <span className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 font-bold text-sm shrink-0">
+          SAC
+        </span>
+        <div>
+          <h3 className="text-lg font-bold text-slate-900">{sac.titulo}</h3>
+          <p className="text-xs sm:text-sm text-slate-500">{sac.subtitulo}</p>
+        </div>
       </div>
 
-      <p className="text-gray-700 mb-4 leading-relaxed">{sac.descricao}</p>
+      <p className="text-slate-700 text-sm sm:text-base mb-5 leading-relaxed">{sac.descricao}</p>
 
-      <ul className="space-y-2 mb-5">
+      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
         {sac.pontos.map((ponto) => (
-          <li key={ponto} className="flex items-start gap-2 text-gray-700">
-            <span className="text-green-500 mt-1" aria-hidden="true">
+          <li
+            key={ponto}
+            className="flex items-start gap-2.5 text-sm text-slate-700 bg-slate-50/80 border border-slate-100 rounded-xl p-3.5"
+          >
+            <span
+              className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold shrink-0 mt-0.5"
+              aria-hidden="true"
+            >
               ✓
             </span>
             <span>{ponto}</span>
@@ -169,9 +190,13 @@ function PainelSAC() {
         ))}
       </ul>
 
-      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-        <p className="text-sm font-medium text-green-800 mb-1">Fórmula:</p>
-        <code className="text-green-900 text-sm">{sac.formula}</code>
+      <div className="bg-slate-900 text-slate-100 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <span className="text-xs font-semibold uppercase tracking-wider text-emerald-400">
+          Fórmula de Cálculo
+        </span>
+        <code className="text-xs sm:text-sm font-mono text-white bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
+          {sac.formula}
+        </code>
       </div>
     </div>
   );
@@ -182,17 +207,28 @@ function PainelPrice() {
 
   return (
     <div id="painel-price" role="tabpanel" aria-labelledby="tab-price">
-      <div className="mb-4">
-        <h3 className="text-lg font-bold text-blue-700">{price.titulo}</h3>
-        <p className="text-sm text-gray-500">{price.subtitulo}</p>
+      <div className="flex items-center gap-3 mb-4">
+        <span className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-blue-100 text-blue-700 font-bold text-xs shrink-0">
+          PRICE
+        </span>
+        <div>
+          <h3 className="text-lg font-bold text-slate-900">{price.titulo}</h3>
+          <p className="text-xs sm:text-sm text-slate-500">{price.subtitulo}</p>
+        </div>
       </div>
 
-      <p className="text-gray-700 mb-4 leading-relaxed">{price.descricao}</p>
+      <p className="text-slate-700 text-sm sm:text-base mb-5 leading-relaxed">{price.descricao}</p>
 
-      <ul className="space-y-2 mb-5">
+      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
         {price.pontos.map((ponto) => (
-          <li key={ponto} className="flex items-start gap-2 text-gray-700">
-            <span className="text-blue-500 mt-1" aria-hidden="true">
+          <li
+            key={ponto}
+            className="flex items-start gap-2.5 text-sm text-slate-700 bg-slate-50/80 border border-slate-100 rounded-xl p-3.5"
+          >
+            <span
+              className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-100 text-blue-700 text-xs font-bold shrink-0 mt-0.5"
+              aria-hidden="true"
+            >
               ✓
             </span>
             <span>{ponto}</span>
@@ -200,9 +236,13 @@ function PainelPrice() {
         ))}
       </ul>
 
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <p className="text-sm font-medium text-blue-800 mb-1">Fórmula:</p>
-        <code className="text-blue-900 text-sm">{price.formula}</code>
+      <div className="bg-slate-900 text-slate-100 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <span className="text-xs font-semibold uppercase tracking-wider text-blue-400">
+          Fórmula de Cálculo
+        </span>
+        <code className="text-xs sm:text-sm font-mono text-white bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
+          {price.formula}
+        </code>
       </div>
     </div>
   );
@@ -213,29 +253,29 @@ function PainelComparacao() {
 
   return (
     <div id="painel-comparacao" role="tabpanel" aria-labelledby="tab-comparacao">
-      <div className="mb-4">
-        <h3 className="text-lg font-bold text-purple-700">{comparacao.titulo}</h3>
-        <p className="text-sm text-gray-500">{comparacao.subtitulo}</p>
+      <div className="mb-5">
+        <h3 className="text-lg font-bold text-slate-900">{comparacao.titulo}</h3>
+        <p className="text-xs sm:text-sm text-slate-500">{comparacao.subtitulo}</p>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm" role="table">
+      <div className="overflow-x-auto rounded-xl border border-slate-200/80">
+        <table className="w-full text-xs sm:text-sm" role="table">
           <thead>
-            <tr className="border-b border-gray-200">
-              <th className="text-left py-3 px-4 font-semibold text-gray-700">Critério</th>
-              <th className="text-left py-3 px-4 font-semibold text-green-700">SAC</th>
-              <th className="text-left py-3 px-4 font-semibold text-blue-700">Price</th>
+            <tr className="bg-slate-50 border-b border-slate-200/80">
+              <th className="text-left py-3 px-3 sm:px-4 font-semibold text-slate-700">Critério</th>
+              <th className="text-left py-3 px-3 sm:px-4 font-bold text-emerald-700">SAC</th>
+              <th className="text-left py-3 px-3 sm:px-4 font-bold text-blue-700">Price</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-slate-100">
             {comparacao.criterios.map((item) => (
               <tr
                 key={item.criterio}
-                className="border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors"
+                className="even:bg-slate-50/40 hover:bg-slate-50 transition-colors"
               >
-                <td className="py-3 px-4 font-medium text-gray-800">{item.criterio}</td>
-                <td className="py-3 px-4 text-green-700">{item.sac}</td>
-                <td className="py-3 px-4 text-blue-700">{item.price}</td>
+                <td className="py-3 px-3 sm:px-4 font-semibold text-slate-800">{item.criterio}</td>
+                <td className="py-3 px-3 sm:px-4 text-emerald-800 font-medium">{item.sac}</td>
+                <td className="py-3 px-3 sm:px-4 text-blue-800 font-medium">{item.price}</td>
               </tr>
             ))}
           </tbody>

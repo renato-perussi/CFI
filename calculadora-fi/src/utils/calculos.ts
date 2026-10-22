@@ -3,20 +3,24 @@ import type { Parcela, Resultado, ComparacaoFinanciamento } from '../types/finan
 export function calcularSAC(valorFinanciado: number, taxaJuros: number, prazo: number): Resultado {
   const taxaDecimal = taxaJuros / 100;
   const amortizacaoFixa = valorFinanciado / prazo;
+  const amortizacaoPadrao = Number(amortizacaoFixa.toFixed(2));
   const tabela: Parcela[] = [];
-  let saldoDevedor = valorFinanciado;
+  let saldoDevedor = Number(valorFinanciado.toFixed(2));
 
   for (let mes = 1; mes <= prazo; mes++) {
-    const juros = saldoDevedor * taxaDecimal;
-    const parcela = amortizacaoFixa + juros;
-    saldoDevedor -= amortizacaoFixa;
+    const jurosArredondados = Number((saldoDevedor * taxaDecimal).toFixed(2));
+    const amortizacaoArredondada =
+      mes === prazo ? Number(saldoDevedor.toFixed(2)) : amortizacaoPadrao;
+    const parcelaArredondada = Number((amortizacaoArredondada + jurosArredondados).toFixed(2));
+    saldoDevedor =
+      mes === prazo ? 0 : Number(Math.max(saldoDevedor - amortizacaoArredondada, 0).toFixed(2));
 
     tabela.push({
       mes,
-      amortizacao: Number(amortizacaoFixa.toFixed(2)),
-      juros: Number(juros.toFixed(2)),
-      parcela: Number(parcela.toFixed(2)),
-      saldoDevedor: Number(Math.max(saldoDevedor, 0).toFixed(2)),
+      amortizacao: amortizacaoArredondada,
+      juros: jurosArredondados,
+      parcela: parcelaArredondada,
+      saldoDevedor,
     });
   }
 
@@ -30,37 +34,52 @@ export function calcularPrice(
 ): Resultado {
   const taxaDecimal = taxaJuros / 100;
   const tabela: Parcela[] = [];
-  let saldoDevedor = valorFinanciado;
+  let saldoDevedor = Number(valorFinanciado.toFixed(2));
 
   if (taxaDecimal === 0) {
     const parcelaFixa = valorFinanciado / prazo;
+    const parcelaPadrao = Number(parcelaFixa.toFixed(2));
     for (let mes = 1; mes <= prazo; mes++) {
-      saldoDevedor -= parcelaFixa;
+      const amortizacaoArredondada =
+        mes === prazo ? Number(saldoDevedor.toFixed(2)) : parcelaPadrao;
+      saldoDevedor =
+        mes === prazo ? 0 : Number(Math.max(saldoDevedor - amortizacaoArredondada, 0).toFixed(2));
       tabela.push({
         mes,
-        amortizacao: Number(parcelaFixa.toFixed(2)),
+        amortizacao: amortizacaoArredondada,
         juros: 0,
-        parcela: Number(parcelaFixa.toFixed(2)),
-        saldoDevedor: Number(Math.max(saldoDevedor, 0).toFixed(2)),
+        parcela: amortizacaoArredondada,
+        saldoDevedor,
       });
     }
     return calcularTotais(tabela);
   }
 
   const fator = Math.pow(1 + taxaDecimal, prazo);
-  const parcelaFixa = valorFinanciado * ((taxaDecimal * fator) / (fator - 1));
+  const fatorFinito = Number.isFinite(fator);
+  const parcelaFixa = !fatorFinito
+    ? valorFinanciado * taxaDecimal
+    : valorFinanciado * ((taxaDecimal * fator) / (fator - 1));
+  const parcelaPadrao = Number(parcelaFixa.toFixed(2));
 
   for (let mes = 1; mes <= prazo; mes++) {
-    const juros = saldoDevedor * taxaDecimal;
-    const amortizacao = parcelaFixa - juros;
-    saldoDevedor -= amortizacao;
+    const jurosArredondados = Number((saldoDevedor * taxaDecimal).toFixed(2));
+    const isUltimaComFatorFinito = mes === prazo && fatorFinito;
+    const amortizacaoArredondada = isUltimaComFatorFinito
+      ? Number(saldoDevedor.toFixed(2))
+      : Number((parcelaPadrao - jurosArredondados).toFixed(2));
+    const parcelaArredondada = isUltimaComFatorFinito
+      ? Number((amortizacaoArredondada + jurosArredondados).toFixed(2))
+      : parcelaPadrao;
+    saldoDevedor =
+      mes === prazo ? 0 : Number(Math.max(saldoDevedor - amortizacaoArredondada, 0).toFixed(2));
 
     tabela.push({
       mes,
-      amortizacao: Number(amortizacao.toFixed(2)),
-      juros: Number(juros.toFixed(2)),
-      parcela: Number(parcelaFixa.toFixed(2)),
-      saldoDevedor: Number(Math.max(saldoDevedor, 0).toFixed(2)),
+      amortizacao: amortizacaoArredondada,
+      juros: jurosArredondados,
+      parcela: parcelaArredondada,
+      saldoDevedor,
     });
   }
 

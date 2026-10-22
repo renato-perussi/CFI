@@ -50,7 +50,8 @@ export function useFormCalculator() {
     } else if (valorImovel > 0) {
       const entradaMinima = valorImovel * 0.2;
       if (entrada < entradaMinima) {
-        newErrors.entrada = `Entrada mínima de ${formatarEntradaMoeda(String(entradaMinima * 100))}`;
+        const minimoFormatado = formatarEntradaMoeda(String(Math.round(entradaMinima * 100)));
+        newErrors.entrada = `Entrada mínima de R$ ${minimoFormatado} (20%)`;
       } else if (entrada >= valorImovel) {
         newErrors.entrada = 'Entrada deve ser menor que o valor do imóvel';
       }
@@ -60,6 +61,8 @@ export function useFormCalculator() {
       newErrors.taxaJuros = 'Campo obrigatório';
     } else if (isNaN(taxaJuros) || taxaJuros < 0) {
       newErrors.taxaJuros = 'Taxa de juros deve ser maior ou igual a zero';
+    } else if (taxaJuros > 20) {
+      newErrors.taxaJuros = 'Taxa de juros máxima de 20% ao mês';
     }
 
     if (!vals.prazoMeses) {
@@ -95,25 +98,49 @@ export function useFormCalculator() {
           break;
       }
 
-      setValues((prev) => ({ ...prev, [field]: formattedValue }));
+      const nextValues = { ...values, [field]: formattedValue };
+      setValues(nextValues);
 
-      if (errors[field]) {
-        setErrors((prev) => {
-          const newErrors = { ...prev };
-          delete newErrors[field];
-          return newErrors;
-        });
-      }
+      setErrors((prev) => {
+        const nextErrors = { ...prev };
+        delete nextErrors[field];
+
+        if (field === 'valorImovel' && nextValues.entrada) {
+          const fieldErrors = validate(nextValues);
+          if (fieldErrors.entrada) {
+            nextErrors.entrada = fieldErrors.entrada;
+          } else {
+            delete nextErrors.entrada;
+          }
+        }
+
+        return nextErrors;
+      });
     },
-    [errors]
+    [values, validate]
   );
 
   const handleBlur = useCallback(
     (field: keyof FormValues) => {
       const fieldErrors = validate(values);
-      if (fieldErrors[field]) {
-        setErrors((prev) => ({ ...prev, [field]: fieldErrors[field] }));
-      }
+      setErrors((prev) => {
+        const nextErrors = { ...prev };
+        if (fieldErrors[field]) {
+          nextErrors[field] = fieldErrors[field];
+        } else {
+          delete nextErrors[field];
+        }
+
+        if (field === 'valorImovel' && values.entrada) {
+          if (fieldErrors.entrada) {
+            nextErrors.entrada = fieldErrors.entrada;
+          } else {
+            delete nextErrors.entrada;
+          }
+        }
+
+        return nextErrors;
+      });
     },
     [values, validate]
   );
@@ -140,11 +167,6 @@ export function useFormCalculator() {
     };
   }, [values, validateAll]);
 
-  const reset = useCallback(() => {
-    setValues(initialValues);
-    setErrors({});
-  }, []);
-
   const handleSubmit = useCallback(
     (onSubmit: (financiamento: Financiamento) => void) => {
       return (e: React.FormEvent) => {
@@ -166,6 +188,5 @@ export function useFormCalculator() {
     handleChange,
     handleBlur,
     handleSubmit,
-    reset,
   };
 }

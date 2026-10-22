@@ -9,11 +9,7 @@ function formatarValorCSV(valor: number): string {
   });
 }
 
-export function gerarCSV(
-  dados: Parcela[],
-  separador = ';',
-  titulo?: string
-): string {
+export function gerarCSV(dados: Parcela[], separador = ';', titulo?: string): string {
   const linhas: string[] = [];
 
   if (titulo) {
@@ -37,10 +33,7 @@ export function gerarCSV(
   return linhas.join('\n');
 }
 
-export function gerarCSVCompleto(
-  dadosSAC: Parcela[],
-  dadosPrice: Parcela[]
-): string {
+export function gerarCSVCompleto(dadosSAC: Parcela[], dadosPrice: Parcela[]): string {
   const partes: string[] = [];
 
   partes.push(gerarCSV(dadosSAC, ';', 'SAC — Sistema de Amortização Constante'));

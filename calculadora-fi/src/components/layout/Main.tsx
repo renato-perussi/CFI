@@ -5,5 +5,7 @@ interface MainProps {
 }
 
 export function Main({ children }: MainProps) {
-  return <main className="flex-1 container mx-auto px-4 py-8">{children}</main>;
+  return (
+    <main className="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 py-8 md:py-10">{children}</main>
+  );
 }

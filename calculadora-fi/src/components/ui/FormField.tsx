@@ -1,3 +1,4 @@
+import type { InputHTMLAttributes, ReactNode } from 'react';
 import { InputField } from './InputField';
 
 interface FormFieldProps {
@@ -8,8 +9,11 @@ interface FormFieldProps {
   error?: string;
   prefix?: string;
   suffix?: string;
+  badge?: string;
+  hint?: ReactNode;
   placeholder?: string;
   type?: 'text' | 'number';
+  inputMode?: InputHTMLAttributes<HTMLInputElement>['inputMode'];
   maxLength?: number;
   disabled?: boolean;
   id?: string;
@@ -23,8 +27,11 @@ export function FormField({
   error,
   prefix,
   suffix,
+  badge,
+  hint,
   placeholder,
   type = 'text',
+  inputMode = 'numeric',
   maxLength,
   disabled = false,
   id,
@@ -42,8 +49,11 @@ export function FormField({
       error={error}
       prefix={prefix}
       suffix={suffix}
+      badge={badge}
+      hint={hint}
       placeholder={placeholder}
       type={type}
+      inputMode={inputMode}
       maxLength={maxLength}
       disabled={disabled}
       id={id}
