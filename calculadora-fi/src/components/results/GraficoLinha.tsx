@@ -1,29 +1,10 @@
 import { memo, useMemo } from 'react';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler,
-} from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import type { Resultado } from '../../types/financiamento';
 import { formatarMoeda, formatarMoedaCompacta, formatarNumero } from '../../utils/format';
+import { registerChart, COR_SAC, COR_SAC_BG, COR_PRICE, COR_PRICE_BG } from '../../utils/chart';
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-);
+registerChart();
 
 interface GraficoLinhaProps {
   titulo: string;
@@ -34,11 +15,6 @@ interface GraficoLinhaProps {
   resultadoSAC: Resultado;
   resultadoPrice: Resultado;
 }
-
-const COR_SAC = '#059669';
-const COR_SAC_BG = 'rgba(5, 150, 105, 0.08)';
-const COR_PRICE = '#2563eb';
-const COR_PRICE_BG = 'rgba(37, 99, 235, 0.08)';
 
 export const GraficoLinha = memo(function GraficoLinha({
   titulo,
@@ -147,6 +123,7 @@ export const GraficoLinha = memo(function GraficoLinha({
         y: {
           title: {
             display: false,
+            text: rotuloEixoY,
           },
           ticks: {
             maxTicksLimit: 6,
@@ -163,7 +140,7 @@ export const GraficoLinha = memo(function GraficoLinha({
         },
       },
     }),
-    []
+    [rotuloEixoY]
   );
 
   return (

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import type { Parcela } from '../../types/financiamento';
 import { formatarMoeda } from '../../utils/format';
 import { Paginacao } from '../ui/Paginacao';
@@ -11,12 +11,10 @@ interface TabelaAmortizacaoProps {
 
 export function TabelaAmortizacao({ titulo, dados }: TabelaAmortizacaoProps) {
   const [paginaAtual, setPaginaAtual] = useState(1);
-  const [prevDados, setPrevDados] = useState(dados);
 
-  if (prevDados !== dados) {
-    setPrevDados(dados);
+  useEffect(() => {
     setPaginaAtual(1);
-  }
+  }, [dados]);
 
   const totalPaginas = Math.max(Math.ceil(dados.length / ITENS_POR_PAGINA), 1);
   const paginaSegura = Math.min(paginaAtual, totalPaginas);

@@ -1,18 +1,15 @@
 import { FormField } from '../ui/FormField';
 import { useFormCalculator } from '../../hooks/useFormCalculator';
-import {
-  formatarMoeda,
-  formatarPercentual,
-  parseMoedaParaNumero,
-  parsePercentualParaNumero,
-} from '../../utils/format';
+import { parseMoedaParaNumero, parsePercentualParaNumero } from '../../utils/format';
 import {
   calcularPercentualEntrada,
   calcularTaxaAnualEquivalente,
   formatarPrazoEmAnos,
   calcularValorFinanciadoPreview,
 } from '../../utils/analise';
-import { ENTRADAS_SUGERIDAS, PRAZOS_SUGERIDOS } from '../../constants/negocio';
+import { AtalhosEntrada } from './AtalhosEntrada';
+import { AtalhosPrazo } from './AtalhosPrazo';
+import { PreviewPrincipal } from './PreviewPrincipal';
 import type { Financiamento } from '../../types/financiamento';
 
 interface FormCalculatorProps {
@@ -65,39 +62,11 @@ export function FormCalculator({ onSubmit }: FormCalculatorProps) {
           id="entrada"
           badge={percentualEntrada}
           hint={
-            <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-              <span className="text-slate-400 mr-0.5">Atalhos:</span>
-              {ENTRADAS_SUGERIDAS.map((item) => {
-                const valorAlvoCentavos =
-                  valorImovelNum > 0 ? Math.round(valorImovelNum * item.percentual) : 0;
-                const ativo =
-                  valorImovelNum > 0 &&
-                  Math.abs(Math.round(entradaNum * 100) - valorAlvoCentavos) <= 1;
-
-                return (
-                  <button
-                    key={item.percentual}
-                    type="button"
-                    disabled={valorImovelNum <= 0}
-                    onMouseDown={(e) => e.preventDefault()}
-                    onClick={() => {
-                      if (valorImovelNum > 0) {
-                        handleChange('entrada', String(valorAlvoCentavos));
-                      }
-                    }}
-                    className={`px-2 py-0.5 rounded-md text-[11px] font-medium transition-colors ${
-                      valorImovelNum <= 0
-                        ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                        : ativo
-                          ? 'bg-blue-600 text-white cursor-pointer'
-                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer'
-                    }`}
-                  >
-                    {item.rotulo}
-                  </button>
-                );
-              })}
-            </div>
+            <AtalhosEntrada
+              valorImovelNum={valorImovelNum}
+              entradaNum={entradaNum}
+              onSelecionar={(centavos) => handleChange('entrada', centavos)}
+            />
           }
         />
 
@@ -126,46 +95,16 @@ export function FormCalculator({ onSubmit }: FormCalculatorProps) {
           id="prazo"
           badge={prazoEmAnos}
           hint={
-            <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-              <span className="text-slate-400 mr-0.5">Atalhos:</span>
-              {PRAZOS_SUGERIDOS.map((item) => {
-                const ativo = values.prazoMeses === item.meses;
-                return (
-                  <button
-                    key={item.meses}
-                    type="button"
-                    onMouseDown={(e) => e.preventDefault()}
-                    onClick={() => handleChange('prazoMeses', item.meses)}
-                    className={`px-2 py-0.5 rounded-md text-[11px] font-medium transition-colors cursor-pointer ${
-                      ativo
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                    }`}
-                  >
-                    {item.rotulo}
-                  </button>
-                );
-              })}
-            </div>
+            <AtalhosPrazo
+              prazoMeses={values.prazoMeses}
+              onSelecionar={(meses) => handleChange('prazoMeses', meses)}
+            />
           }
         />
       </div>
 
       {valorFinanciadoPreview !== null && (
-        <div className="rounded-xl bg-slate-50 border border-slate-200/80 px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm animate-fadeIn">
-          <div className="flex items-center gap-2 text-slate-600">
-            <span className="w-2 h-2 rounded-full bg-blue-600 shrink-0" aria-hidden="true" />
-            <span>Valor a financiar (Principal):</span>
-          </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-base font-bold text-slate-900 tabular-nums">
-              {formatarMoeda(valorFinanciadoPreview)}
-            </span>
-            <span className="text-xs font-medium text-slate-500 tabular-nums">
-              ({formatarPercentual((valorFinanciadoPreview / valorImovelNum) * 100, 0)}% do imóvel)
-            </span>
-          </div>
-        </div>
+        <PreviewPrincipal valor={valorFinanciadoPreview} valorImovelNum={valorImovelNum} />
       )}
 
       <div className="pt-2 border-t border-slate-100">
