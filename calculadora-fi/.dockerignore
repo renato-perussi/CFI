@@ -1,0 +1,37 @@
+# Dependências e artefatos de build locais
+node_modules
+dist
+dist-ssr
+coverage
+.nyc_output
+*.tsbuildinfo
+
+# Logs e arquivos temporários
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+tmp
+temp
+*.tmp
+*.bak
+
+# Variáveis de ambiente locais
+.env
+.env.*
+*.local
+
+# Controle de versão, IDEs e SO
+.git
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# Documentação e metadados Docker desnecessários dentro de /app
+README.md
+Dockerfile
+.dockerignore

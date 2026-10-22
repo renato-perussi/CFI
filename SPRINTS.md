@@ -1,11 +1,11 @@
 # Sprints — Calculadora de Financiamento Imobiliário
 
 **Projeto:** Calculadora de Financiamento Imobiliário  
-**Base:** PRD v1.3 + v1.4 (implementados e validados em 22/10/2026) + PRD §29 / v1.5-draft (Dockerização e Orquestração planejadas em 22/10/2026)  
+**Base:** PRD v1.3 + v1.4 + v1.5 (implementados e validados em 22/10/2026)  
 **Metodologia:** Sprints iterativas com entregas incrementais  
 **Stack Frontend:** React 19 + TypeScript ~6.0 + Tailwind CSS 4.3 + Vite 8.1 (Chart.js 4.5, Vitest 5.0, OxLint 1.71)  
 **Stack Infra/Containers (v1.5):** Docker Multi-Stage (`node:22-alpine` + `nginxinc/nginx-unprivileged:stable-alpine`) + Docker Compose  
-**Status em 22/10/2026:** Sprints 1–18 implementadas e commitadas (123 testes passando em 10 arquivos, OxLint/Prettier limpos, `dist/` ~460KB). Sprints 19–22 (Dockerização v1.5) planejadas, prontas para implementação.
+**Status em 22/10/2026:** Sprints 1–22 implementadas e validadas (123 testes passando em 10 arquivos, OxLint/Prettier limpos, `dist/` ~460KB, containers `app`, `dev` e `test` operacionais).
 
 ---
 
@@ -566,8 +566,8 @@
 
 | ID | Tarefa | Onde | Critério de Aceite |
 |----|--------|------|-------------------|
-| S22-01 | Validar suíte de qualidade em container (`test`) | Terminal / Docker | `docker compose --profile test run --rm test` executa OxLint, Prettier (`format:check`) e Vitest (123/123 testes passando) com exit code `0` |
-| S22-02 | Validar imagem e container de produção (`app`) | Terminal / Docker | `docker compose up -d --build app` sobe container `healthy`; imagem final `< 60MB`; `curl -I http://localhost:8080` retorna `200 OK` com headers de segurança, `Cache-Control: no-cache` no HTML e `immutable` nos assets `/assets/*.js` |
+| S22-01 | Validar suíte de qualidade em container (`test`) | Terminal / Docker | `docker compose --profile test run --rm --build test` executa OxLint, Prettier (`format:check`) e Vitest (123/123 testes passando) com exit code `0` |
+| S22-02 | Validar imagem e container de produção (`app`) | Terminal / Docker | `docker compose up -d --build app` sobe container `healthy`; imagem final `< 60MB` comprimida (~25,7MB `CONTENT SIZE` / ~90,8MB `DISK USAGE`); `curl -I http://localhost:8080` retorna `200 OK` com headers de segurança, `Cache-Control: no-cache` no HTML e `immutable` nos assets `/assets/*.js` |
 | S22-03 | Validar container de desenvolvimento (`dev`) | Terminal / Docker | `docker compose --profile dev up -d --build dev` responde `200 OK` em `http://localhost:5173` servindo a aplicação via Vite HMR |
 | S22-04 | Atualizar documentação do projeto | `README.md`, `calculadora-fi/README.md`, `AGENTS.md` | Comandos de execução via Docker (produção, porta customizada, dev HMR e testes) documentados de forma clara |
 
@@ -591,12 +591,12 @@ Cada Sprint só será considerada completa quando:
 - [ ] Cross-browser testado (últimas 2 versões)
 - [ ] Code review realizado
 - [x] Documentação atualizada — PRD v1.3 + v1.4, SPRINTS (Sprints 1–18), README com screenshots em 22/10/2026
-- [ ] Dockerização v1.5 — PRD §29 + SPRINTS 19–22 planejados em 22/10/2026, pendente implementação
+- [x] Dockerização v1.5 — PRD §29 + SPRINTS 19–22 implementados e validados em 22/10/2026 (`app` healthy non-root na porta 8080, `dev` com HMR na porta 5173, `test` com 123/123 testes passando)
 
 > DoD específico das Sprints 13–18 (refatoração segura — **concluído**): sem mudança visual/funcional (RFR-001); `npx vitest run` PASS (123 testes / 10 arquivos); `rg 'replace\(/\\./g'` sem ocorrências fora de `format.ts`; `tsc -b && vite build` OK; `npm run lint` zero errors e `format:check` OK.
 
 > DoD específico das Sprints 19–22 (Dockerização v1.5):
-> 1. `docker compose --profile test run --rm test` passa `lint`, `format:check` e `test` (123 testes);
+> 1. `docker compose --profile test run --rm --build test` passa `lint`, `format:check` e `test` (123 testes);
 > 2. `docker compose up -d --build app` inicia sem `root` na porta `${PORT:-8080}`, atinge status `healthy` e serve `index.html` + chunks lazy (`results`, `education`) com `gzip` e headers de cache/segurança;
 > 3. `docker compose --profile dev up -d --build dev` serve Vite com HMR em `http://localhost:5173`;
 > 4. `README.md`, `calculadora-fi/README.md` e `AGENTS.md` documentam os comandos Docker.
@@ -714,5 +714,5 @@ Sprint 19 (.dockerignore + nginx.conf) → 20 (Dockerfile Multi-Stage) → 21 (D
 
 ---
 
-**Status em 22/10/2026:** Sprints 1–18 implementadas e validadas (123 testes passando em 10 arquivos, `dist/` ~460KB). Sprints 19–22 (Dockerização v1.5, PRD §29) planejadas, não iniciadas.  
-**Próximo passo:** (1) executar Sprints 19→22 em ordem (`.dockerignore` + `nginx.conf` → `Dockerfile` → `docker-compose.yml` → validação E2E e docs), (2) testes cross-browser, (3) PWA / INCC-TR / PDF-XLSX / ITBI (alinhado ao Roadmap do README).
+**Status em 22/10/2026:** Sprints 1–22 implementadas e validadas (123 testes passando em 10 arquivos, `dist/` ~460KB, Dockerização multi-stage + Docker Compose verificados E2E).  
+**Próximo passo:** (1) testes cross-browser, (2) PWA / INCC-TR / PDF-XLSX / ITBI (alinhado ao Roadmap do README).

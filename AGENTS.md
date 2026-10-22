@@ -12,6 +12,13 @@ Single app lives in `calculadora-fi/`. Run ALL npm commands there, never at root
 - `npm run format` / `npm run format:check` — Prettier, scope is only `src/**/*.{ts,tsx,css,json}` (`printWidth: 100`, single quotes, semi, `es5` trailing commas)
 - Requires Node 20+ (Vite 8). `dist/` is gitignored; production build was ~460KB.
 
+## Docker Commands (from repo root)
+
+- `docker compose up -d --build app` — Production container (`nginxinc/nginx-unprivileged:stable-alpine`, non-root UID 101) at `http://localhost:${PORT:-8080}`
+- `docker compose --profile dev up -d --build dev` — Vite HMR dev container at `http://localhost:${DEV_PORT:-5173}`
+- `docker compose --profile test run --rm --build test` — Runs `npm run lint && npm run format:check && npm run test` inside `node:22-alpine` (`check` stage)
+- `Dockerfile`, `nginx.conf`, and `.dockerignore` live in `calculadora-fi/`; `docker-compose.yml` lives at the repo root (`context: ./calculadora-fi`). Keep `.gitignore` out of `.dockerignore` so `oxlint` ignores `node_modules/` inside the container. Use `npm ci --legacy-peer-deps` in `Dockerfile` due to bundled WASM peerDependencies in `@tailwindcss/oxide-wasm32-wasi`.
+
 ## Architecture
 
 - Entry: `src/main.tsx` → `src/App.tsx`. `App` lazy-loads (`lazy`+`Suspense`) `results/FinancingComparison` and `education/EducationalContent`.

@@ -1,0 +1,47 @@
+services:
+  app:
+    build:
+      context: ./calculadora-fi
+      dockerfile: Dockerfile
+      target: prod
+    image: cfi-app:prod
+    container_name: cfi-app
+    ports:
+      - "${PORT:-8080}:8080"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:8080/ || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+  dev:
+    profiles:
+      - dev
+    build:
+      context: ./calculadora-fi
+      dockerfile: Dockerfile
+      target: dev
+    image: cfi-app:dev
+    container_name: cfi-dev
+    ports:
+      - "${DEV_PORT:-5173}:5173"
+    volumes:
+      - ./calculadora-fi/src:/app/src
+      - ./calculadora-fi/public:/app/public
+      - ./calculadora-fi/index.html:/app/index.html
+      - ./calculadora-fi/vite.config.ts:/app/vite.config.ts
+      - ./calculadora-fi/tsconfig.json:/app/tsconfig.json
+      - ./calculadora-fi/tsconfig.app.json:/app/tsconfig.app.json
+      - ./calculadora-fi/tsconfig.node.json:/app/tsconfig.node.json
+
+  test:
+    profiles:
+      - test
+    build:
+      context: ./calculadora-fi
+      dockerfile: Dockerfile
+      target: check
+    image: cfi-app:test
+    container_name: cfi-test

@@ -85,12 +85,14 @@ Abas SAC / Price / Comparação com fórmulas e quadro decisório.
 | Gráficos | Chart.js + react-chartjs-2 | 4.5 + 5.3 |
 | Testes | Vitest + Testing Library + jsdom | 5.0 + 16.3 |
 | Qualidade | OxLint + Prettier | 1.71 + 3.9 |
+| Containers | Docker Multi-Stage (`node:22-alpine` + `nginxinc/nginx-unprivileged:stable-alpine`) + Docker Compose | — |
 | Fontes | Inter + Plus Jakarta Sans (Google Fonts) | — |
 
 Sem backend. Todos os cálculos são locais no navegador.
 
 ## Pré-requisitos
 
+**Opção A — Execução local (Node.js):**
 - Node.js 20+ (Vite 8 exige Node 20.19+ / 22.12+)
 - npm 10+
 
@@ -101,7 +103,30 @@ node --version
 npm --version
 ```
 
+**Opção B — Execução via Docker:**
+- Docker Engine 24+ e Docker Compose v2+ (`docker compose version`)
+
 ## Início rápido
+
+### Com Docker (na raiz do repositório)
+
+```bash
+# Produção (Nginx non-root na porta 8080, ou defina PORT=3000)
+docker compose up -d --build app
+# Acesse http://localhost:8080
+
+# Desenvolvimento com Hot Reload (Vite HMR na porta 5173)
+docker compose --profile dev up -d --build dev
+# Acesse http://localhost:5173
+
+# Executar suíte de qualidade (OxLint + Prettier + 123 testes Vitest) em container
+docker compose --profile test run --rm --build test
+
+# Encerrar containers
+docker compose --profile dev down
+```
+
+### Com Node.js local
 
 O app vive em `calculadora-fi/`:
 
@@ -191,6 +216,9 @@ Execute dentro de `calculadora-fi/`:
 │   │   └── index.css
 │   ├── public/              # favicon.svg, og-image.svg
 │   ├── .oxlintrc.json / .prettierrc
+│   ├── .dockerignore        # Isolamento do contexto de build Docker
+│   ├── Dockerfile           # Multi-stage (base, dev, check, builder, prod)
+│   ├── nginx.conf           # Configuração SPA, cache, gzip e security headers (porta 8080)
 │   ├── vite.config.ts
 │   ├── dist/                # build (gerado, 460KB em 22/10/2026)
 │   └── package.json
@@ -202,6 +230,7 @@ Execute dentro de `calculadora-fi/`:
 │       ├── 03-graficos.png
 │       ├── 04-tabela.png
 │       └── 05-educativo.png
+├── docker-compose.yml       # Orquestração Docker (app, dev, test)
 ├── LICENSE                  # MIT
 └── README.md                # Este arquivo
 ```
@@ -248,8 +277,8 @@ npm run dev  # :5173
 
 ## Documentação
 
-- `PRD.md` v1.5 — visão, personas, FR/NFR (+FR-033 a FR-039 pós-MVP), fórmulas, refatoração v1.4 (§28) e plano de Dockerização v1.5 (§29, requisitos DKR-001 a DKR-008)
-- `SPRINTS.md` — Sprints 1–18 implementadas (123 testes / 10 arquivos) + Sprints 19–22 (Dockerização multi-stage + Nginx non-root + Docker Compose) planejadas
+- `PRD.md` v1.5 — visão, personas, FR/NFR (+FR-033 a FR-039 pós-MVP), fórmulas, refatoração v1.4 (§28) e Dockerização v1.5 (§29, requisitos DKR-001 a DKR-008) — implementados e validados em 22/10/2026
+- `SPRINTS.md` — Sprints 1–18 (produto + refatoração modular, 123 testes / 10 arquivos) + Sprints 19–22 (Dockerização multi-stage + Nginx non-root + Docker Compose) implementadas e validadas em 22/10/2026
 - `calculadora-fi/README.md` — README técnico resumido do app
 
 ## Roadmap
@@ -259,7 +288,7 @@ npm run dev  # :5173
 - [x] Sprints 9-11: paginação, +3 gráficos, CSV
 - [x] Sprint 8: SEO, OG tags, acessibilidade, performance
 - [x] Sprints 12-18: refinos pós-MVP + refatoração modular v1.4 (123 testes)
-- [ ] Sprints 19-22: Dockerização multi-stage (`node:22-alpine` + `nginx-unprivileged`) e Docker Compose
+- [x] Sprints 19-22: Dockerização multi-stage (`node:22-alpine` + `nginx-unprivileged`) e Docker Compose
 - [ ] PWA / salvar simulações localStorage
 - [ ] Comparar com correção INCC/TR
 - [ ] Exportar PDF/XLSX

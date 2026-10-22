@@ -1,8 +1,8 @@
 # PRD — Calculadora de Financiamento Imobiliário
 
-**Versão:** 1.5 (draft — dockerização planejada)  
+**Versão:** 1.5  
 **Data:** 22 de Outubro de 2026  
-**Status:** v1.3 e v1.4 (refatoração Sprints 13–18, 123 testes / 10 arquivos) implementados e validados; v1.5 (Dockerização e Orquestração, Sprints 19–22) planejado  
+**Status:** v1.3, v1.4 (refatoração Sprints 13–18, 123 testes / 10 arquivos) e v1.5 (Dockerização e Orquestração, Sprints 19–22) implementados e validados  
 
 ---
 
@@ -501,7 +501,7 @@ Onde:
 - [x] Exportação CSV
 - [x] Paginação de tabelas
 - [x] Plano de refatoração e modularização (v1.4, sem mudança funcional)
-- [ ] Plano de Dockerização e Orquestração (v1.5, Sprints 19–22)
+- [x] Plano de Dockerização e Orquestração (v1.5, Sprints 19–22)
 
 ---
 
@@ -597,9 +597,9 @@ src/
 ### 29.2 Decisões Arquiteturais (ADRs)
 
 1. **ADR-01 — Imagem Base de Build (`node:22-alpine`):** Atende com folga o requisito de engine do Vite 8 (`^22.12.0`), reduz drasticamente o tamanho das camadas intermediárias e é compatível com os pacotes `-musl` já mapeados no `package-lock.json`.
-2. **ADR-02 — Servidor de Produção (`nginxinc/nginx-unprivileged:stable-alpine`):** Substitui `vite preview` (não recomendado para produção) por um servidor Nginx oficial que roda sem privilégios de `root` (UID `101`, porta interna `8080`), gerando uma imagem final enxuta (~40–50 MB) e segura.
+2. **ADR-02 — Servidor de Produção (`nginxinc/nginx-unprivileged:stable-alpine`):** Substitui `vite preview` (não recomendado para produção) por um servidor Nginx oficial que roda sem privilégios de `root` (UID `101`, porta interna `8080`), gerando uma imagem final enxuta (~25,7 MB `CONTENT SIZE` comprimido / ~90,8 MB `DISK USAGE`) e segura.
 3. **ADR-03 — Porta Padrão Parametrizável (`${PORT:-8080}:8080`):** Expõe por padrão em `http://localhost:8080` (evitando conflito com portas privilegiadas `<1024`, `5173` do Vite dev e `3000`), permitindo sobrescrita imediata via variável de ambiente (`PORT=3000 docker compose up -d`).
-4. **ADR-04 — Estágio de Qualidade (`check`) Desacoplado do `builder`:** O comando `npm run build` já executa `tsc -b && vite build` (garantindo checagem estrita de tipos no build de produção). O estágio `check` (OxLint + Prettier + 123 testes Vitest/jsdom) fica disponível no mesmo `Dockerfile` herdando o cache de `base`, podendo ser executado sob demanda ou em CI (`docker compose --profile test run --rm test`) sem penalizar o tempo de build de produção.
+4. **ADR-04 — Estágio de Qualidade (`check`) Desacoplado do `builder`:** O comando `npm run build` já executa `tsc -b && vite build` (garantindo checagem estrita de tipos no build de produção). O estágio `check` (OxLint + Prettier + 123 testes Vitest/jsdom) fica disponível no mesmo `Dockerfile` herdando o cache de `base`, podendo ser executado sob demanda ou em CI (`docker compose --profile test run --rm --build test`) sem penalizar o tempo de build de produção.
 5. **ADR-05 — Orquestração na Raiz (`docker-compose.yml`):** Posicionado na raiz do projeto apontando para `./calculadora-fi`, permitindo subir produção (`app`), desenvolvimento com HMR (`dev`) ou suíte de testes (`test`) diretamente da raiz do repositório.
 
 ### 29.3 Arquitetura Multi-Stage e Estrutura de Arquivos
@@ -650,4 +650,4 @@ src/
 | Permissão negada ao rodar Nginx como usuário non-root | Alto (container não inicia se tentar usar porta 80 ou `/var/cache/nginx` restrito) | Baixa | Uso da imagem oficial `nginxinc/nginx-unprivileged:stable-alpine` pré-configurada para UID `101` e porta `8080` |
 | Vite Dev Server inacessível fora do container | Médio (`Connection reset` no host) | Alta (se omitido flag) | Passar `--host 0.0.0.0` explicitamente no `CMD` do stage `dev` |
 
-**Status do PRD:** v1.3 implementado e validado; v1.4 (refatoração, §28 + Sprints 13–18) implementado e validado (123 testes Vitest passando em 10 arquivos, OxLint e Prettier limpos, build `dist/` ~460KB). v1.5 (Dockerização, §29 + Sprints 19–22) planejado em 22/10/2026.
+**Status do PRD:** v1.3 implementado e validado; v1.4 (refatoração, §28 + Sprints 13–18) implementado e validado (123 testes Vitest passando em 10 arquivos, OxLint e Prettier limpos, build `dist/` ~460KB); v1.5 (Dockerização, §29 + Sprints 19–22) implementado e validado em 22/10/2026 (containers `app`, `dev` e `test` verificados E2E).

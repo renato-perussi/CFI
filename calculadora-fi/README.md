@@ -28,6 +28,14 @@ npm install
 npm run dev
 ```
 
+### Com Docker (a partir da raiz do repositorio `../`)
+
+```bash
+docker compose up -d --build app                  # Producao em http://localhost:8080 (ou PORT=3000)
+docker compose --profile dev up -d --build dev    # Dev HMR em http://localhost:5173
+docker compose --profile test run --rm --build test # OxLint + Prettier + 123 testes Vitest
+```
+
 ## Comandos
 
 | Comando | Descricao |
