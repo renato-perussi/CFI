@@ -13,9 +13,9 @@ export function AbasTabelas({ dados }: AbasTabelasProps) {
 
   return (
     <section aria-label="Tabelas de amortização" className="space-y-4">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white p-3 rounded-2xl border border-slate-200/90 shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-neutral-50 p-3 rounded-2xl border border-stone-200">
         <div
-          className="grid grid-cols-2 sm:flex bg-slate-100 p-1 rounded-xl gap-1"
+          className="grid grid-cols-2 sm:flex bg-stone-200/70 p-1 rounded-xl gap-1"
           role="tablist"
           aria-label="Selecionar tabela de amortização"
         >
@@ -26,10 +26,10 @@ export function AbasTabelas({ dados }: AbasTabelasProps) {
             aria-selected={abaAtiva === 'SAC'}
             aria-controls="painel-tabela-sac"
             onClick={() => setAbaAtiva('SAC')}
-            className={`px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-200 cursor-pointer ${
+            className={`px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200 cursor-pointer ${
               abaAtiva === 'SAC'
-                ? 'bg-white text-emerald-700 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-stone-900 text-[#c1ff72] shadow-xs'
+                : 'text-stone-600 hover:text-stone-900'
             }`}
           >
             Tabela SAC
@@ -41,10 +41,10 @@ export function AbasTabelas({ dados }: AbasTabelasProps) {
             aria-selected={abaAtiva === 'PRICE'}
             aria-controls="painel-tabela-price"
             onClick={() => setAbaAtiva('PRICE')}
-            className={`px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-200 cursor-pointer ${
+            className={`px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200 cursor-pointer ${
               abaAtiva === 'PRICE'
-                ? 'bg-white text-blue-700 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-[#002f43] text-white shadow-xs'
+                : 'text-stone-600 hover:text-stone-900'
             }`}
           >
             Tabela Price

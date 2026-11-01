@@ -7,15 +7,15 @@ interface PainelSistemaProps {
 const ESTILOS = {
   sac: {
     sigla: 'SAC',
-    badge: 'bg-emerald-100 text-emerald-700 font-bold text-sm',
-    selo: 'bg-emerald-100 text-emerald-700',
-    formula: 'text-emerald-400',
+    badge: 'bg-[#c1ff72] text-stone-900 border border-[#aae65f] font-bold text-sm',
+    selo: 'bg-[#c1ff72] text-stone-900',
+    formula: 'text-[#c1ff72] font-mono text-xs uppercase tracking-wider',
   },
   price: {
     sigla: 'PRICE',
-    badge: 'bg-blue-100 text-blue-700 font-bold text-xs',
-    selo: 'bg-blue-100 text-blue-700',
-    formula: 'text-blue-400',
+    badge: 'bg-[#002f43] text-white font-bold text-xs',
+    selo: 'bg-sky-100 text-[#002f43]',
+    formula: 'text-[#c1ff72] font-mono text-xs uppercase tracking-wider',
   },
 } as const;
 
@@ -33,12 +33,12 @@ export function PainelSistema({ variante }: PainelSistemaProps) {
           {estilos.sigla}
         </span>
         <div>
-          <h3 className="text-lg font-bold text-slate-900">{sistema.titulo}</h3>
-          <p className="text-xs sm:text-sm text-slate-500">{sistema.subtitulo}</p>
+          <h3 className="text-lg font-bold text-stone-900 font-montserrat">{sistema.titulo}</h3>
+          <p className="text-xs sm:text-sm text-stone-500 font-montserrat">{sistema.subtitulo}</p>
         </div>
       </div>
 
-      <p className="text-slate-700 text-sm sm:text-base mb-5 leading-relaxed">
+      <p className="text-stone-700 text-sm sm:text-base mb-5 leading-relaxed">
         {sistema.descricao}
       </p>
 
@@ -46,7 +46,7 @@ export function PainelSistema({ variante }: PainelSistemaProps) {
         {sistema.pontos.map((ponto) => (
           <li
             key={ponto}
-            className="flex items-start gap-2.5 text-sm text-slate-700 bg-slate-50/80 border border-slate-100 rounded-xl p-3.5"
+            className="flex items-start gap-2.5 text-sm text-stone-700 bg-neutral-50 border border-stone-200 rounded-xl p-3.5"
           >
             <span
               className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold shrink-0 mt-0.5 ${estilos.selo}`}
@@ -59,11 +59,11 @@ export function PainelSistema({ variante }: PainelSistemaProps) {
         ))}
       </ul>
 
-      <div className="bg-slate-900 text-slate-100 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+      <div className="bg-stone-900 text-white rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border border-stone-800">
         <span className={`text-xs font-semibold uppercase tracking-wider ${estilos.formula}`}>
           Fórmula de Cálculo
         </span>
-        <code className="text-xs sm:text-sm font-mono text-white bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
+        <code className="text-xs sm:text-sm font-mono text-white bg-stone-800 px-3 py-1.5 rounded-lg border border-stone-700">
           {sistema.formula}
         </code>
       </div>

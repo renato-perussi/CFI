@@ -11,19 +11,22 @@ export function ConteudoEducativo() {
   return (
     <section className="pt-4" aria-labelledby="educacao-titulo">
       <div className="mb-5">
-        <span className="text-xs font-bold uppercase tracking-wider text-blue-600 block mb-1">
+        <span className="font-semibold text-xs tracking-widest uppercase mb-3 block text-stone-900 bg-stone-100 w-fit px-3 py-1.5 rounded">
           Guia de Decisão
         </span>
-        <h2 id="educacao-titulo" className="text-xl sm:text-2xl font-bold text-slate-900">
+        <h2
+          id="educacao-titulo"
+          className="font-montserrat text-2xl sm:text-3xl font-medium text-stone-900 tracking-tight"
+        >
           Entenda os Sistemas de Financiamento
         </h2>
-        <p className="text-sm sm:text-base text-slate-600 mt-1">
+        <p className="text-sm sm:text-base text-stone-500 mt-1 font-montserrat">
           Conheça as diferenças estruturais entre SAC e Price para tomar a melhor decisão.
         </p>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-xs border border-slate-200/90 overflow-hidden">
-        <div className="p-2 sm:p-3 bg-slate-50 border-b border-slate-200/80">
+      <div className="bg-white rounded-[32px] border border-stone-200 overflow-hidden">
+        <div className="p-2 sm:p-3 bg-neutral-50 border-b border-stone-200">
           <AbasEducacao abaAtiva={abaAtiva} onMudarAba={setAbaAtiva} />
         </div>
 

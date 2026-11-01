@@ -29,76 +29,76 @@ export function TabelaAmortizacao({ titulo, dados }: TabelaAmortizacaoProps) {
   const mesFinal = dadosPaginados[dadosPaginados.length - 1]?.mes ?? 0;
 
   return (
-    <div className="bg-white rounded-2xl shadow-xs border border-slate-200/90 overflow-hidden">
-      <div className="px-5 sm:px-6 py-4 border-b border-slate-200/80 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 bg-slate-50/50">
-        <h4 className="text-xs sm:text-sm font-bold text-slate-700 uppercase tracking-wider">
+    <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden">
+      <div className="px-5 sm:px-6 py-4 border-b border-stone-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 bg-neutral-50">
+        <h4 className="text-xs sm:text-sm font-bold text-stone-900 uppercase tracking-wider font-montserrat">
           {titulo}
         </h4>
-        <div className="flex items-center justify-between sm:justify-end gap-3 text-xs text-slate-500 tabular-nums">
+        <div className="flex items-center justify-between sm:justify-end gap-3 text-xs text-stone-500 tabular-nums">
           <span>
-            Exibindo meses <strong className="font-semibold text-slate-700">{mesInicial}</strong> a{' '}
-            <strong className="font-semibold text-slate-700">{mesFinal}</strong> de{' '}
-            <strong className="font-semibold text-slate-700">{dados.length}</strong>
+            Exibindo meses <strong className="font-semibold text-stone-700">{mesInicial}</strong> a{' '}
+            <strong className="font-semibold text-stone-700">{mesFinal}</strong> de{' '}
+            <strong className="font-semibold text-stone-700">{dados.length}</strong>
           </span>
-          <span className="sm:hidden text-slate-400">Deslize →</span>
+          <span className="sm:hidden text-stone-400">Deslize →</span>
         </div>
       </div>
 
       <div className="overflow-x-auto">
         <table className="w-full text-xs sm:text-sm tabular-nums" role="table" aria-label={titulo}>
           <thead>
-            <tr className="bg-slate-50 border-b border-slate-200/80">
+            <tr className="bg-neutral-50 border-b border-stone-200 text-xs uppercase tracking-wider text-stone-500 font-montserrat">
               <th
                 scope="col"
-                className="px-3.5 sm:px-5 py-3 text-left font-semibold text-slate-600 whitespace-nowrap"
+                className="px-3.5 sm:px-5 py-3 text-left font-semibold whitespace-nowrap"
               >
                 Mês
               </th>
               <th
                 scope="col"
-                className="px-3.5 sm:px-5 py-3 text-right font-semibold text-slate-600 whitespace-nowrap"
+                className="px-3.5 sm:px-5 py-3 text-right font-semibold whitespace-nowrap"
               >
                 Amortização
               </th>
               <th
                 scope="col"
-                className="px-3.5 sm:px-5 py-3 text-right font-semibold text-slate-600 whitespace-nowrap"
+                className="px-3.5 sm:px-5 py-3 text-right font-semibold whitespace-nowrap"
               >
                 Juros
               </th>
               <th
                 scope="col"
-                className="px-3.5 sm:px-5 py-3 text-right font-bold text-slate-800 bg-slate-100/60 whitespace-nowrap"
+                className="px-3.5 sm:px-5 py-3 text-right font-bold text-stone-900 bg-stone-100/80 whitespace-nowrap"
               >
                 Parcela
               </th>
               <th
                 scope="col"
-                className="px-3.5 sm:px-5 py-3 text-right font-semibold text-slate-600 whitespace-nowrap"
+                className="px-3.5 sm:px-5 py-3 text-right font-semibold whitespace-nowrap"
               >
                 Saldo Devedor
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-stone-200/70">
             {dadosPaginados.map((parcela) => (
               <tr
                 key={parcela.mes}
-                className="even:bg-slate-50/40 hover:bg-blue-50/40 transition-colors"
+                className="even:bg-neutral-50/40 hover:bg-[#c1ff72]/15 transition-colors"
               >
-                <td className="px-3.5 sm:px-5 py-3 font-semibold text-slate-700 whitespace-nowrap">
+                <td className="px-3.5 sm:px-5 py-3 font-semibold text-stone-700 whitespace-nowrap">
                   {parcela.mes}
                 </td>
-                <td className="px-3.5 sm:px-5 py-3 text-right text-slate-600 whitespace-nowrap">
+                <td className="px-3.5 sm:px-5 py-3 text-right text-stone-600 whitespace-nowrap">
                   {formatarMoeda(parcela.amortizacao)}
                 </td>
-                <td className="px-3.5 sm:px-5 py-3 text-right text-slate-600 whitespace-nowrap">
+                <td className="px-3.5 sm:px-5 py-3 text-right text-stone-600 whitespace-nowrap">
                   {formatarMoeda(parcela.juros)}
                 </td>
-                <td className="px-3.5 sm:px-5 py-3 text-right font-bold text-slate-900 bg-slate-50/60 whitespace-nowrap">
+                <td className="px-3.5 sm:px-5 py-3 text-right font-bold text-stone-900 bg-stone-100/80 whitespace-nowrap">
                   {formatarMoeda(parcela.parcela)}
                 </td>
-                <td className="px-3.5 sm:px-5 py-3 text-right text-slate-600 whitespace-nowrap">
+                <td className="px-3.5 sm:px-5 py-3 text-right text-stone-600 whitespace-nowrap">
                   {formatarMoeda(parcela.saldoDevedor)}
                 </td>
               </tr>

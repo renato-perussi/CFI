@@ -19,12 +19,12 @@ export function BotaoExportarCSV({ dadosSAC, dadosPrice }: BotaoExportarCSVProps
     <button
       type="button"
       onClick={handleExportar}
-      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 text-xs sm:text-sm font-semibold text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 hover:text-slate-900 hover:border-slate-400 transition-all duration-200 cursor-pointer shrink-0"
+      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 text-xs sm:text-sm font-semibold text-stone-900 bg-white border border-stone-200 rounded-xl hover:bg-stone-900 hover:text-[#c1ff72] hover:border-stone-900 transition-all duration-200 cursor-pointer shrink-0"
       aria-label="Exportar tabelas em CSV"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        className="w-4 h-4 text-slate-500 shrink-0"
+        className="w-4 h-4 shrink-0"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"

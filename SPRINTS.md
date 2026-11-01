@@ -1,12 +1,12 @@
 # Sprints — Calculadora de Financiamento Imobiliário
 
 **Projeto:** Calculadora de Financiamento Imobiliário  
-**Base:** PRD v1.3 + v1.4 + v1.5 (implementados e validados em 22/10/2026) + v1.6 (Redesign NectArr Design System — Sprints 23–26 concluídas em 01/11/2026, Sprints 27–28 planejadas)  
+**Base:** PRD v1.3 + v1.4 + v1.5 (implementados e validados em 22/10/2026) + v1.6 (Redesign NectArr Design System — Sprints 23–27 concluídas em 01/11/2026, Sprint 28 planejada)  
 **Metodologia:** Sprints iterativas com entregas incrementais  
 **Stack Frontend:** React 19 + TypeScript ~6.0 + Tailwind CSS 4.3 + Vite 8.1 (Chart.js 4.5, Vitest 5.0, OxLint 1.71)  
 **Stack Infra/Containers (v1.5):** Docker Multi-Stage (`node:22-alpine` + `nginxinc/nginx-unprivileged:stable-alpine`) + Docker Compose  
 **Design System (v1.6):** NectArr Design System (`design_system/design-system.html` — `Geist` + `Montserrat`, Brand Lime `#c1ff72`, Deep Navy `#002f43`, `stone`/`neutral`, `.glass-panel`, `.spotlight-card`, `.grid-lines`)  
-**Status em 01/11/2026:** Sprints 1–26 implementadas e validadas (123 testes passando em 10 arquivos, OxLint/Prettier limpos, `dist/` ~460KB, containers `app`, `dev` e `test` operacionais, Sprints 23, 25 e 26 com code-audit "Pass"); Sprints 27–28 planejadas para execução etapa por etapa do redesign v1.6.
+**Status em 01/11/2026:** Sprints 1–27 implementadas e validadas (123 testes passando em 10 arquivos, OxLint/Prettier limpos, `dist/` ~460KB, containers `app`, `dev` e `test` operacionais, Sprints 23, 25, 26 e 27 com code-audit "Pass"); Sprint 28 planejada para conclusão do redesign v1.6.
 
 ---
 
@@ -689,9 +689,11 @@
 
 ---
 
-## Sprint 27 — Redesign das Tabelas, Paginação, Exportação CSV e Conteúdo Educativo
+## Sprint 27 — Redesign das Tabelas, Paginação, Exportação CSV e Conteúdo Educativo — ✅ Concluída em 01/11/2026
 
 **Objetivo:** Alinhar as tabelas de amortização, controles de abas, paginação, exportação CSV e guia educativo ao padrão `.ds-spec-table` e aos cards de produto/solução do `design-system.html` (RDS-003, RDS-007, RDS-008, RDS-009).
+
+**Status:** ✅ Implementada e validada em 01/11/2026 — `npm run lint`, `format:check`, `test` (123/123) e `build` passando; auditoria de código com veredito "Pass" (zero findings bloqueantes).
 
 ### Tarefas
 
@@ -745,7 +747,7 @@ Cada Sprint só será considerada completa quando:
 - [ ] Code review realizado
 - [x] Documentação atualizada — PRD v1.3 + v1.4, SPRINTS (Sprints 1–18), README com screenshots em 22/10/2026
 - [x] Dockerização v1.5 — PRD §29 + SPRINTS 19–22 implementados e validados em 22/10/2026 (`app` healthy non-root na porta 8080, `dev` com HMR na porta 5173, `test` com 123/123 testes passando)
-- [ ] Redesign NectArr Design System v1.6 — PRD §30 + SPRINTS 23–28 (Sprints 23–26 concluídas em 01/11/2026; Sprints 27–28 planejadas)
+- [ ] Redesign NectArr Design System v1.6 — PRD §30 + SPRINTS 23–28 (Sprints 23–27 concluídas em 01/11/2026; Sprint 28 planejada)
 
 > DoD específico das Sprints 13–18 (refatoração segura — **concluído**): sem mudança visual/funcional (RFR-001); `npx vitest run` PASS (123 testes / 10 arquivos); `rg 'replace\(/\\./g'` sem ocorrências fora de `format.ts`; `tsc -b && vite build` OK; `npm run lint` zero errors e `format:check` OK.
 
@@ -899,5 +901,5 @@ Sprint 28 (Assets SVG + Auditoria Cromática + 123 Testes + Screenshots)
 
 ---
 
-**Status em 01/11/2026:** Sprints 1–26 implementadas e validadas (123 testes passando em 10 arquivos, `dist/` ~460KB, Dockerização multi-stage + Docker Compose verificados E2E, Sprints 23, 25 e 26 com code-audit "Pass"). Sprints 27–28 especificadas e prontas para implementação etapa por etapa do Redesign v1.6 (`design_system/design-system.html`).  
-**Próximo passo:** Executar as Sprints 27 a 28 (Redesign v1.6), seguidas de (1) testes cross-browser e (2) PWA / INCC-TR / PDF-XLSX / ITBI.
+**Status em 01/11/2026:** Sprints 1–27 implementadas e validadas (123 testes passando em 10 arquivos, `dist/` ~460KB, Dockerização multi-stage + Docker Compose verificados E2E, Sprints 23, 25, 26 e 27 com code-audit "Pass"). Sprint 28 especificada e pronta para implementação final do Redesign v1.6 (`design_system/design-system.html`).  
+**Próximo passo:** Executar a Sprint 28 (Redesign v1.6), seguida de (1) testes cross-browser e (2) PWA / INCC-TR / PDF-XLSX / ITBI.
