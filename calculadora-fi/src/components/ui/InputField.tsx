@@ -29,11 +29,14 @@ export function InputField({
   return (
     <div className="flex flex-col">
       <div className="flex items-center justify-between gap-2 mb-1.5">
-        <label htmlFor={inputId} className="block text-sm font-semibold text-slate-700">
+        <label
+          htmlFor={inputId}
+          className="block font-montserrat text-sm font-semibold text-stone-800"
+        >
           {label}
         </label>
         {badge && (
-          <span className="text-xs font-medium px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 tabular-nums">
+          <span className="text-xs font-medium px-2 py-0.5 rounded-md bg-stone-100 text-stone-700 border border-stone-200 tabular-nums">
             {badge}
           </span>
         )}
@@ -41,7 +44,7 @@ export function InputField({
 
       <div className="relative">
         {prefix && (
-          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-semibold text-sm select-none pointer-events-none">
+          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 font-semibold text-sm select-none pointer-events-none">
             {prefix}
           </span>
         )}
@@ -49,18 +52,18 @@ export function InputField({
           ref={ref}
           id={inputId}
           className={`
-            w-full px-3.5 py-2.5 bg-slate-50/60 border rounded-xl text-base font-medium text-slate-900 tabular-nums
-            placeholder:text-slate-400 placeholder:font-normal
+            w-full px-3.5 py-2.5 bg-neutral-50 border rounded-xl text-base font-medium text-stone-900 tabular-nums
+            placeholder:text-stone-400 placeholder:font-normal
             transition-all duration-150
-            hover:border-slate-400 hover:bg-white
-            focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600
-            disabled:bg-slate-100 disabled:cursor-not-allowed
+            hover:border-stone-300 hover:bg-white
+            focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#c1ff72]/60 focus:border-stone-900
+            disabled:bg-stone-100 disabled:cursor-not-allowed
             ${prefix ? 'pl-11' : ''}
             ${suffix ? 'pr-10' : ''}
             ${
               error
                 ? 'border-red-400 bg-red-50/30 focus:ring-red-500/20 focus:border-red-500'
-                : 'border-slate-300'
+                : 'border-stone-200'
             }
             ${className}
           `}
@@ -69,7 +72,7 @@ export function InputField({
           {...props}
         />
         {suffix && (
-          <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-semibold text-sm select-none pointer-events-none">
+          <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-400 font-semibold text-sm select-none pointer-events-none">
             {suffix}
           </span>
         )}
@@ -100,7 +103,7 @@ export function InputField({
       )}
 
       {hint && (
-        <div id={`${inputId}-hint`} className="mt-1.5 text-xs text-slate-500">
+        <div id={`${inputId}-hint`} className="mt-1.5 text-xs text-stone-500">
           {hint}
         </div>
       )}

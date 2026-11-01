@@ -107,17 +107,17 @@ export function FormCalculator({ onSubmit }: FormCalculatorProps) {
         <PreviewPrincipal valor={valorFinanciadoPreview} valorImovelNum={valorImovelNum} />
       )}
 
-      <div className="pt-2 border-t border-slate-100">
+      <div className="pt-2 border-t border-stone-200/80">
         <button
           type="submit"
           disabled={!isValid}
           className={`
-            w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-base
+            w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full font-semibold text-base
             transition-all duration-200
             ${
               isValid
-                ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm hover:shadow focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer'
-                : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                ? 'bg-stone-900 text-[#c1ff72] hover:bg-stone-800 shadow-lg hover:shadow-[0_0_20px_rgba(193,255,114,0.25)] focus:outline-none focus:ring-2 focus:ring-[#c1ff72] focus:ring-offset-2 cursor-pointer'
+                : 'bg-stone-200 text-stone-400 cursor-not-allowed'
             }
           `}
         >

@@ -10,7 +10,7 @@ interface AtalhosEntradaProps {
 export function AtalhosEntrada({ valorImovelNum, entradaNum, onSelecionar }: AtalhosEntradaProps) {
   return (
     <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-      <span className="text-slate-400 mr-0.5">Atalhos:</span>
+      <span className="text-stone-400 font-montserrat text-xs mr-0.5">Atalhos:</span>
       {ENTRADAS_SUGERIDAS.map((item) => {
         const valorAlvoCentavos =
           valorImovelNum > 0 ? Math.round(valorImovelNum * item.percentual) : 0;
@@ -28,12 +28,12 @@ export function AtalhosEntrada({ valorImovelNum, entradaNum, onSelecionar }: Ata
                 onSelecionar(String(valorAlvoCentavos));
               }
             }}
-            className={`px-2 py-0.5 rounded-md text-[11px] font-medium transition-colors ${
+            className={`px-2 py-0.5 rounded-md text-[11px] font-medium border transition-colors ${
               valorImovelNum <= 0
-                ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                ? 'bg-stone-100 text-stone-400 border-stone-200 cursor-not-allowed'
                 : ativo
-                  ? 'bg-blue-600 text-white cursor-pointer'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer'
+                  ? 'bg-stone-900 text-[#c1ff72] border-stone-900 cursor-pointer'
+                  : 'bg-stone-100 text-stone-600 border-stone-200 hover:bg-stone-200 hover:text-stone-900 cursor-pointer'
             }`}
           >
             {item.rotulo}

@@ -9,7 +9,7 @@ interface AtalhosPrazoProps {
 export function AtalhosPrazo({ prazoMeses, onSelecionar }: AtalhosPrazoProps) {
   return (
     <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-      <span className="text-slate-400 mr-0.5">Atalhos:</span>
+      <span className="text-stone-400 font-montserrat text-xs mr-0.5">Atalhos:</span>
       {PRAZOS_SUGERIDOS.map((item) => {
         const ativo = prazoMeses === item.meses;
         return (
@@ -18,8 +18,10 @@ export function AtalhosPrazo({ prazoMeses, onSelecionar }: AtalhosPrazoProps) {
             type="button"
             onMouseDown={(e) => e.preventDefault()}
             onClick={() => onSelecionar(item.meses)}
-            className={`px-2 py-0.5 rounded-md text-[11px] font-medium transition-colors cursor-pointer ${
-              ativo ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            className={`px-2 py-0.5 rounded-md text-[11px] font-medium border transition-colors cursor-pointer ${
+              ativo
+                ? 'bg-stone-900 text-[#c1ff72] border-stone-900'
+                : 'bg-stone-100 text-stone-600 border-stone-200 hover:bg-stone-200 hover:text-stone-900'
             }`}
           >
             {item.rotulo}
