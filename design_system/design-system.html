@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NectArr — Design System</title>
+<script src="https://cdn.tailwindcss.com/"></script>
+<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+<script>
+tailwind.config = {
+theme: {
+extend: {
+fontFamily: { sans: ['Geist', 'sans-serif'] },
+colors: {
+brand: { lime: '#c1ff72' },
+neutral: { 50: '#fafafa', 100: '#f5f5f5', 200: '#e5e5e5', 300: '#d4d4d4', 400: '#a3a3a3', 500: '#737373', 600: '#525252', 700: '#404040', 800: '#262626', 900: '#171717' }
+},
+animation: {
+'marquee': 'marquee 40s linear infinite',
+'clip-in': 'clipIn 1.2s cubic-bezier(0.25, 1, 0.5, 1) both',
+'fade-up': 'fadeUp 0.8s ease-out forwards',
+'float': 'float 6s ease-in-out infinite',
+'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+},
+keyframes: {
+marquee: { '0%': { transform: 'translateX(0%)' }, '100%': { transform: 'translateX(-50%)' } },
+clipIn: { '0%': { opacity: '0', clipPath: 'inset(0 0 100% 0)' }, '100%': { opacity: '1', clipPath: 'inset(0 0 0 0)' } },
+fadeUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } }
+}
+}
+}
+}
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap">
+<style>
+.font-geist { font-family: 'Geist', sans-serif !important; }
+.font-montserrat { font-family: 'Montserrat', sans-serif !important; }
+.font-google-sans-flex { font-family: 'Geist', sans-serif !important; letter-spacing: -0.04em; }
+.glass-panel { background: rgba(255,255,255,0.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.5); }
+.glass-panel-dark { background: rgba(23,23,23,0.8); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.1); }
+.spotlight-card { position: relative; overflow: hidden; }
+.spotlight-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(193,255,114,0.15), transparent 40%); opacity: 0; transition: opacity 0.5s; pointer-events: none; z-index: 10; }
+.spotlight-card:hover::before { opacity: 1; }
+.grid-lines { background-size: 40px 40px; background-image: linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px); }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
+<style>
+@property --angle-1 { syntax: "<angle>"; inherits: false; initial-value: -75deg; }
+@property --angle-2 { syntax: "<angle>"; inherits: false; initial-value: -45deg; }
+.glass-button { background: linear-gradient(-75deg, rgba(193,255,114,0.1), rgba(255,255,255,0.5), rgba(193,255,114,0.1)); box-shadow: inset 0 0.125em 0.125em rgba(0,0,0,0.05), inset 0 -0.125em 0.125em rgba(255,255,255,0.5), 0 0.25em 0.125em -0.125em rgba(0,0,0,0.2), 0 0 0.1em 0.25em rgba(193,255,114,0.4) inset, 0 0 0 0 rgba(255,255,255,1); backdrop-filter: blur(4px); transition: all 400ms cubic-bezier(0.25,1,0.5,1); }
+.glass-button:hover { transform: scale(0.98); }
+.button-shine { position: absolute; inset: 0; border-radius: 999px; width: calc(100% - 1px); height: calc(100% - 1px); top: 0.5px; left: 0.5px; background: linear-gradient(var(--angle-2), rgba(255,255,255,0) 0%, rgba(193,255,114,0.5) 40% 50%, rgba(255,255,255,0) 55%); mix-blend-mode: screen; pointer-events: none; background-size: 200% 200%; background-position: 0% 50%; background-repeat: no-repeat; transition: background-position 500ms, --angle-2 500ms; }
+.glass-button:hover .button-shine { background-position: 25% 50%; }
+</style>
+<style>
+/* Docs chrome only — layout for labels/tables/nav offset. Never applied to demonstrated patterns. */
+.ds-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 70; }
+.ds-section-label { font-family: 'Montserrat', sans-serif; font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; }
+.ds-spec-table { width: 100%; border-collapse: collapse; }
+.ds-spec-table td, .ds-spec-table th { vertical-align: top; }
+.ds-swatch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+html { scroll-padding-top: 120px; }
+</style>
+</head>
+<body class="min-h-screen overflow-x-hidden selection:bg-[#c1ff72] selection:text-neutral-900 text-neutral-900 font-geist bg-neutral-100 relative">
+
+<!-- Docs nav (chrome only) -->
+<nav class="ds-nav bg-stone-900 text-white border-b border-stone-800">
+<div class="max-w-[1600px] mx-auto px-6 lg:px-12 h-14 flex items-center justify-between gap-4">
+<a href="#hero" class="font-geist text-sm font-semibold tracking-tighter">NectArr <span class="text-[#c1ff72]">/ Design System</span></a>
+<div class="flex items-center gap-4 lg:gap-6 text-xs font-montserrat font-medium overflow-x-auto no-scrollbar">
+<a href="#hero" class="hover:text-[#c1ff72] transition-colors shrink-0">Hero</a>
+<a href="#typography" class="hover:text-[#c1ff72] transition-colors shrink-0">Typography</a>
+<a href="#colors" class="hover:text-[#c1ff72] transition-colors shrink-0">Colors</a>
+<a href="#components" class="hover:text-[#c1ff72] transition-colors shrink-0">Components</a>
+<a href="#layout" class="hover:text-[#c1ff72] transition-colors shrink-0">Layout</a>
+<a href="#motion" class="hover:text-[#c1ff72] transition-colors shrink-0">Motion</a>
+<a href="#icons" class="hover:text-[#c1ff72] transition-colors shrink-0">Icons</a>
+</div>
+</div>
+</nav>
+
+<div class="h-14"></div>
+
+<!-- Original fixed header reproduced statically for docs (same markup/classes, minus fixed positioning handled by wrapper) -->
+<header class="glass-panel border-b border-stone-200/50">
+<div class="max-w-[1600px] mx-auto px-6 lg:px-12 h-16 lg:h-20 flex items-center justify-between">
+<a href="#" class="block group text-2xl lg:text-3xl font-semibold tracking-tighter font-google-sans-flex">Nect<span class="transition-colors text-slate-950">Arr</span></a>
+<nav class="hidden lg:flex font-montserrat gap-x-10 items-center">
+<a href="#" class="hover:text-stone-900 transition-colors text-sm font-medium text-stone-600">Diferenciais</a>
+<a href="#" class="hover:text-stone-900 transition-colors text-sm font-medium text-stone-600">Produtos</a>
+<a href="#" class="hover:text-stone-900 transition-colors text-sm font-medium text-stone-600">Soluções</a>
+<a href="#" class="hover:text-stone-900 transition-colors text-sm font-medium text-stone-600">Cases</a>
+</nav>
+<div class="flex gap-x-8 items-center">
+<a href="#" class="hidden lg:block hover:text-[#7bb532] text-sm font-bold text-stone-900 font-montserrat">Login</a>
+<button class="bg-stone-900 text-[#c1ff72] hover:bg-stone-800 transition-all font-medium px-4 py-2 lg:px-5 lg:py-2.5 rounded-lg text-xs lg:text-sm flex items-center gap-2 group">Falar com Especialista <iconify-icon icon="lucide:arrow-right" class="group-hover:translate-x-1 transition-transform"></iconify-icon></button>
+</div>
+</div>
+</header>
+
+<div class="fixed grid-lines w-full h-[100vh] top-0 right-0 left-0 pointer-events-none z-0"></div>
+
+<div class="relative z-10 flex flex-col min-h-screen">
+
+<main class="flex-1 w-full">
+
+<!-- ============ 0 — HERO (exact clone, only copy rewritten) ============ -->
+<section id="hero" class="lg:px-12 lg:pt-16 lg:pb-16 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 min-h-[60vh] lg:min-h-[75vh] max-w-[1600px] mr-auto ml-auto pt-8 pr-6 pb-12 pl-6 gap-x-8 gap-y-8 items-center">
+<div class="animate-clip-in lg:col-span-7 space-y-6" style="animation-delay: 0.1s">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-medium bg-white border-stone-200 text-stone-600">
+<span class="w-2 h-2 rounded-full bg-[#c1ff72] animate-pulse"></span>
+Design System · NectArr
+</div>
+<h1 class="leading-[0.95] text-5xl lg:text-7xl xl:text-8xl font-medium text-stone-900 tracking-tighter">
+Documente o <span class="text-slate-950 font-google-sans-flex relative inline-block">NectArr
+<svg class="absolute w-full h-3 -bottom-1 left-0 text-[#c1ff72] -z-10" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="8" fill="none" opacity="0.4"></path></svg>
+</span>.
+</h1>
+<p class="leading-relaxed text-lg lg:text-xl font-normal text-stone-500 font-montserrat max-w-2xl">
+Tipografia, cores, componentes, layout, motion e ícones — extraídos desta página, demonstrados com as classes originais.
+</p>
+<div class="flex flex-col sm:flex-row gap-4 pt-2">
+<button class="glass-button all-unset cursor-pointer outline-none focus:outline-none z-30 pointer-events-auto text-base rounded-full relative group">
+<span class="button-text relative block select-none font-semibold tracking-tight px-8 py-4 text-lg text-stone-900">Agende uma call estratégica</span>
+<div class="button-shine"></div>
+</button>
+<div class="flex items-center gap-3 px-2 sm:px-4 mt-2 sm:mt-0">
+<div class="flex -space-x-3">
+<div class="w-10 h-10 rounded-full border-2 flex items-center justify-center text-xs overflow-hidden border-white bg-stone-200"><img src="https://i.pravatar.cc/100?img=33" class="w-full h-full object-cover" alt=""></div>
+<div class="w-10 h-10 rounded-full border-2 flex items-center justify-center text-xs overflow-hidden border-white bg-stone-200"><img src="https://i.pravatar.cc/100?img=47" class="w-full h-full object-cover" alt=""></div>
+<div class="w-10 h-10 rounded-full border-2 flex items-center justify-center text-xs overflow-hidden border-white bg-stone-200"><img src="https://i.pravatar.cc/100?img=12" class="w-full h-full object-cover" alt=""></div>
+</div>
+<div class="text-sm font-medium text-stone-600">
+<span class="font-bold block leading-none text-stone-900">4.8/5.0</span>
+<span class="text-xs text-stone-400">Rating de Clientes</span>
+</div>
+</div>
+</div>
+</div>
+<div class="lg:col-span-5 flex flex-col h-full justify-center relative animate-fade-up mt-8 lg:mt-0" style="animation-delay: 0.3s;">
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-[#c1ff72] opacity-20 blur-[100px] rounded-full pointer-events-none"></div>
+<div class="relative space-y-4">
+<div class="glass-panel p-4 rounded-xl flex items-center gap-4 animate-float shadow-lg lg:ml-0 max-w-sm mx-auto w-full" style="animation-delay: 0s;">
+<div class="w-10 h-10 rounded-full flex items-center justify-center border shrink-0 bg-lime-50 text-lime-600 border-lime-100"><iconify-icon icon="lucide:mail" width="20"></iconify-icon></div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-center mb-0.5"><p class="text-xs font-semibold text-stone-900">Email de Prospecção</p><span class="text-[10px] text-stone-400">10m atrás</span></div>
+<p class="text-xs text-stone-500 truncate">Ass: Oportunidade de Parceria...</p>
+</div>
+<span class="text-[10px] px-2 py-0.5 rounded border font-medium bg-stone-100 text-stone-600 border-stone-200">Enviado</span>
+</div>
+<div class="glass-panel p-4 rounded-xl flex items-center gap-4 animate-float shadow-lg lg:ml-8 max-w-sm mx-auto w-full" style="animation-delay: 1.5s;">
+<div class="flex shrink-0 bg-[#c1ff72] w-10 h-10 border rounded-full items-center justify-center text-stone-900 border-lime-600"><iconify-icon icon="lucide:linkedin" width="20"></iconify-icon></div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-center mb-0.5"><p class="text-xs font-semibold text-stone-900">Conexão Aceita</p><span class="text-[10px] text-stone-400">2h atrás</span></div>
+<p class="text-xs text-stone-500 truncate">CTO da Enterprise Corp aceitou.</p>
+</div>
+<span class="bg-[#c1ff72] text-[10px] px-2 py-0.5 rounded border border-[#aae65f] font-medium text-stone-900">Conectado</span>
+</div>
+<div class="glass-panel p-4 rounded-xl flex items-center gap-4 animate-float shadow-lg lg:-ml-4 max-w-sm mx-auto w-full" style="animation-delay: 2.5s;">
+<div class="w-10 h-10 rounded-full text-[#c1ff72] flex items-center justify-center border shrink-0 bg-stone-900 border-stone-800"><iconify-icon icon="lucide:calendar-check" width="20"></iconify-icon></div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-center mb-0.5"><p class="text-xs font-semibold text-stone-900">Reunião Agendada</p><span class="text-[10px] text-stone-400">Agora</span></div>
+<p class="text-xs text-stone-500 truncate">Demo com CEO - TechCorp S.A.</p>
+</div>
+<span class="text-[10px] px-2 py-0.5 rounded border font-medium bg-stone-900 text-white border-stone-700">Confirmado</span>
+</div>
+</div>
+</div>
+</section>
+
+<div class="lg:pt-16 bg-white w-full z-20 rounded-t-[40px] pt-12 pb-12 relative shadow-[0_-20px_40px_rgba(0,0,0,0.02)]">
+
+<!-- ============ 1 — TYPOGRAPHY ============ -->
+<section id="typography" class="max-w-[1600px] mx-auto px-6 lg:px-12 mb-12 lg:mb-20">
+<p class="ds-section-label text-stone-400 mb-2">01 — Typography</p>
+<h2 class="text-3xl lg:text-5xl font-medium text-stone-900 tracking-tight font-montserrat mb-10 lg:mb-12">Tipografia da página</h2>
+<div class="border border-stone-200 rounded-2xl overflow-hidden bg-neutral-50">
+<table class="ds-spec-table">
+<thead><tr class="text-left text-xs uppercase tracking-wider text-stone-400 font-montserrat border-b border-stone-200">
+<th class="px-6 py-4 font-semibold w-48">Style</th><th class="px-6 py-4 font-semibold">Preview (elemento + classes originais)</th><th class="px-6 py-4 font-semibold text-right w-40">Size / LH</th>
+</tr></thead>
+<tbody class="divide-y divide-stone-200">
+<tr><td class="px-6 py-6 text-sm font-montserrat font-semibold text-stone-900">Heading 1<br><span class="text-xs font-normal text-stone-400">h1 · font-medium tracking-tighter</span></td>
+<td class="px-6 py-6"><h1 class="leading-[0.95] text-5xl lg:text-7xl xl:text-8xl font-medium text-stone-900 tracking-tighter">Pipeline Previsível <span class="font-google-sans-flex">NectArr</span>.</h1></td>
+<td class="px-6 py-6 text-right text-xs font-mono text-stone-500">48 / 46<br>72 / 68 · 96 / 91</td></tr>
+<tr><td class="px-6 py-6 text-sm font-montserrat font-semibold text-stone-900">Heading 2<br><span class="text-xs font-normal text-stone-400">h2 · font-medium tracking-tight font-montserrat</span></td>
+<td class="px-6 py-6"><h2 class="text-3xl lg:text-5xl font-medium text-stone-900 tracking-tight font-montserrat">Conheça os produtos NectArr</h2></td>
+<td class="px-6 py-6 text-right text-xs font-mono text-stone-500">30 / 36<br>48 / 48</td></tr>
+<tr><td class="px-6 py-6 text-sm font-montserrat font-semibold text-stone-900">Heading 3 · Stats<br><span class="text-xs font-normal text-stone-400">h3 · font-semibold tracking-tighter</span></td>
+<td class="px-6 py-6"><h3 class="text-3xl lg:text-4xl font-semibold tracking-tighter text-stone-900">R$ 45M+</h3></td>
+<td class="px-6 py-6 text-right text-xs font-mono text-stone-500">30 / 36<br>36 / 40</td></tr>
+<tr><td class="px-6 py-6 text-sm font-montserrat font-semibold text-stone-900">Heading 3 · Card<br><span class="text-xs font-normal text-stone-400">h3 · font-bold font-montserrat</span></td>
+<td class="px-6 py-6"><h3 class="lg:text-3xl text-2xl font-bold text-stone-900 font-montserrat">NectArr Marketing</h3><h3 class="lg:text-2xl text-xl font-bold text-stone-900 font-montserrat mt-2">NectArr Chat</h3></td>
+<td class="px-6 py-6 text-right text-xs font-mono text-stone-500">24 / 32 · 30 / 36<br>20 / 28 · 24 / 32</td></tr>
+<tr><td class="px-6 py-6 text-sm font-montserrat font-semibold text-stone-900">Heading 4 · Solutions<br><span class="text-xs font-normal text-stone-400">h3 · text-2xl font-semibold tracking-tight</span></td>
+<td class="px-6 py-6"><h3 class="text-2xl font-semibold tracking-tight mb-3 text-stone-900">Geração de Leads B2B</h3></td>
+<td class="px-6 py-6 text-right text-xs font-mono text-stone-500">24 / 32</td></tr>
+<tr><td class="px-6 py-6 text-sm font-montserrat font-semibold text-stone-900">Paragraph L<br><span class="text-xs font-normal text-stone-400">p · font-montserrat text-stone-500/600</span></td>
+<td class="px-6 py-6"><p class="leading-relaxed text-lg lg:text-xl font-normal text-stone-500 font-montserrat max-w-2xl">Unimos inteligência de dados, automação e SDRs de elite para encher sua agenda com decisores qualificados.</p></td>
+<td class="px-6 py-6 text-right text-xs font-mono text-stone-500">18 / 28<br>20 / 28</td></tr>
+<tr><td class="px-6 py-6 text-sm font-montserrat font-semibold text-stone-900">Paragraph M<br><span class="text-xs font-normal text-stone-400">p · text-sm lg:text-base</span></td>
+<td class="px-6 py-6"><p class="text-stone-500 leading-relaxed text-sm lg:text-base">Identificamos e enriquecemos listas de empresas que se encaixam perfeitamente no seu ICP.</p></td>
+<td class="px-6 py-6 text-right text-xs font-mono text-stone-500">14 / 20<br>16 / 24</td></tr>
+<tr><td class="px-6 py-6 text-sm font-montserrat font-semibold text-stone-900">Label / Eyebrow<br><span class="text-xs font-normal text-stone-400">span · uppercase tracking-widest/wider</span></td>
+<td class="px-6 py-6"><span class="font-semibold text-xs tracking-widest uppercase mb-3 block text-stone-900 bg-stone-100 w-fit px-3 py-1.5 rounded">Nossas Soluções</span><p class="text-sm font-medium text-stone-400 uppercase tracking-widest">Confiado por líderes de mercado</p><span class="text-[#c1ff72] font-mono text-xs uppercase tracking-wider">Live Data</span></td>
+<td class="px-6 py-6 text-right text-xs font-mono text-stone-500">12 / 16</td></tr>
+</tbody>
+</table>
+</div>
+<p class="text-xs text-stone-400 font-montserrat mt-4">Nota: esta tabela documenta apenas estilos presentes na página — Heading 1 → Label, sem tokens inferidos.</p>
+</section>
+
+<!-- ============ 2 — COLORS AND SURFACES ============ -->
+<section id="colors" class="max-w-[1600px] mx-auto px-6 lg:px-12 mb-12 lg:mb-20">
+<p class="ds-section-label text-stone-400 mb-2">02 — Colors &amp; Surfaces</p>
+<h2 class="text-3xl lg:text-5xl font-medium text-stone-900 tracking-tight font-montserrat mb-10 lg:mb-12">Cores e superfícies</h2>
+<div class="ds-swatch-grid mb-6">
+<div class="rounded-2xl border border-stone-200 overflow-hidden bg-white"><div class="h-24 bg-[#c1ff72]"></div><div class="p-4"><p class="text-sm font-semibold text-stone-900 font-montserrat">Brand Lime</p><p class="text-xs font-mono text-stone-500">#c1ff72 · bg-[#c1ff72]</p></div></div>
+<div class="rounded-2xl border border-stone-200 overflow-hidden bg-white"><div class="h-24 bg-[#002f43]"></div><div class="p-4"><p class="text-sm font-semibold text-stone-900 font-montserrat">Deep Navy</p><p class="text-xs font-mono text-stone-500">#002f43 · bg-[#002f43]</p></div></div>
+<div class="rounded-2xl border border-stone-200 overflow-hidden bg-white"><div class="h-24 bg-neutral-100 border-b border-stone-200"></div><div class="p-4"><p class="text-sm font-semibold text-stone-900 font-montserrat">Page</p><p class="text-xs font-mono text-stone-500">#f5f5f5 · bg-neutral-100</p></div></div>
+<div class="rounded-2xl border border-stone-200 overflow-hidden bg-white"><div class="h-24 bg-white border-b border-stone-200"></div><div class="p-4"><p class="text-sm font-semibold text-stone-900 font-montserrat">Section</p><p class="text-xs font-mono text-stone-500">#ffffff · bg-white</p></div></div>
+<div class="rounded-2xl border border-stone-200 overflow-hidden bg-white"><div class="h-24 bg-neutral-50"></div><div class="p-4"><p class="text-sm font-semibold text-stone-900 font-montserrat">Panel</p><p class="text-xs font-mono text-stone-500">#fafafa · bg-neutral-50</p></div></div>
+<div class="rounded-2xl border border-stone-200 overflow-hidden bg-white"><div class="h-24 bg-stone-900"></div><div class="p-4"><p class="text-sm font-semibold text-stone-900 font-montserrat">Ink</p><p class="text-xs font-mono text-stone-500">bg-stone-900 · text-stone-900</p></div></div>
+<div class="rounded-2xl border border-stone-200 overflow-hidden bg-white"><div class="h-24 bg-lime-300"></div><div class="p-4"><p class="text-sm font-semibold text-stone-900 font-montserrat">CRM Card</p><p class="text-xs font-mono text-stone-500">bg-lime-300 · border-lime-300</p></div></div>
+<div class="rounded-2xl border border-stone-200 overflow-hidden bg-white"><div class="h-24 bg-lime-100"></div><div class="p-4"><p class="text-sm font-semibold text-stone-900 font-montserrat">Chat Card</p><p class="text-xs font-mono text-stone-500">bg-lime-100/80 · border-lime-200</p></div></div>
+<div class="rounded-2xl border border-stone-200 overflow-hidden bg-white"><div class="h-24 bg-sky-50"></div><div class="p-4"><p class="text-sm font-semibold text-stone-900 font-montserrat">Store Card</p><p class="text-xs font-mono text-stone-500">bg-sky-50 · border-sky-100</p></div></div>
+<div class="rounded-2xl border border-stone-200 overflow-hidden bg-white"><div class="h-24 bg-stone-100"></div><div class="p-4"><p class="text-sm font-semibold text-stone-900 font-montserrat">Muted fill</p><p class="text-xs font-mono text-stone-500">bg-stone-100 · bg-stone-50</p></div></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="glass-panel p-6 rounded-2xl"><p class="text-sm font-semibold text-stone-900 font-montserrat mb-1">.glass-panel</p><p class="text-xs font-mono text-stone-500">rgba(255,255,255,0.6) · blur(16px) · 1px rgba(255,255,255,0.5)</p><p class="text-xs text-stone-500 mt-2">Header + notification cards hero.</p></div>
+<div class="glass-panel-dark p-6 rounded-2xl"><p class="text-sm font-semibold text-white font-montserrat mb-1">.glass-panel-dark</p><p class="text-xs font-mono text-stone-400">rgba(23,23,23,0.8) · blur(16px) · 1px rgba(255,255,255,0.1)</p><p class="text-xs text-stone-400 mt-2">Token presente no CSS; uso escuro / terminal.</p></div>
+<div class="grid-lines bg-white p-6 rounded-2xl border border-stone-200"><p class="text-sm font-semibold text-stone-900 font-montserrat mb-1">.grid-lines</p><p class="text-xs font-mono text-stone-500">40px · rgba(0,0,0,0.03) 1px</p><p class="text-xs text-stone-500 mt-2">Fundo fixo do hero (100vh, pointer-events-none).</p></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+<div class="p-6 rounded-2xl bg-stone-900 border border-stone-800"><p class="text-sm font-semibold text-white font-montserrat mb-1">Dark surface</p><p class="text-xs font-mono text-stone-400">bg-stone-900 · border-stone-800 · grid overlay rgba(255,255,255,.05) 30px</p></div>
+<div class="p-6 rounded-2xl bg-[#c1ff72]"><p class="text-sm font-semibold text-stone-900 font-montserrat mb-1">CTA surface</p><p class="text-xs font-mono text-stone-800">bg-[#c1ff72] · radial white glows 30% opacity</p></div>
+</div>
+</section>
+
+<!-- ============ 3 — COMPONENTS ============ -->
+<section id="components" class="max-w-[1600px] mx-auto px-6 lg:px-12 mb-12 lg:mb-20">
+<p class="ds-section-label text-stone-400 mb-2">03 — Components</p>
+<h2 class="text-3xl lg:text-5xl font-medium text-stone-900 tracking-tight font-montserrat mb-10 lg:mb-12">Componentes</h2>
+
+<p class="text-sm font-montserrat font-semibold text-stone-900 uppercase tracking-wider mb-4">Buttons</p>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+<div class="p-6 rounded-2xl border border-stone-200 bg-neutral-50 space-y-3">
+<p class="text-xs font-mono text-stone-500">bg-stone-900 text-[#c1ff72] rounded-lg</p>
+<button class="bg-stone-900 text-[#c1ff72] hover:bg-stone-800 transition-all font-medium px-4 py-2 lg:px-5 lg:py-2.5 rounded-lg text-xs lg:text-sm flex items-center gap-2 group">Falar com Especialista <iconify-icon icon="lucide:arrow-right" class="group-hover:translate-x-1 transition-transform"></iconify-icon></button>
+<p class="text-xs text-stone-400">Default / Hover (hover:bg-stone-800) / Focus (focus-visible ring) / Active (scale) / Disabled abaixo</p>
+<button disabled class="bg-stone-900 text-[#c1ff72] font-medium px-5 py-2.5 rounded-lg text-sm opacity-50 cursor-not-allowed">Falar com Especialista</button>
+</div>
+<div class="p-6 rounded-2xl border border-stone-200 bg-neutral-50 space-y-3">
+<p class="text-xs font-mono text-stone-500">.glass-button rounded-full</p>
+<button class="glass-button cursor-pointer text-base rounded-full relative group"><span class="relative block select-none font-semibold tracking-tight px-8 py-4 text-lg text-stone-900">Agende uma call estratégica</span><div class="button-shine"></div></button>
+<p class="text-xs text-stone-400">Default / Hover (scale .98 + shine) / Focus / Active / Disabled abaixo</p>
+<button disabled class="glass-button rounded-full opacity-50 cursor-not-allowed"><span class="block font-semibold tracking-tight px-8 py-4 text-lg text-stone-900">Agende uma call</span><div class="button-shine"></div></button>
+</div>
+<div class="p-6 rounded-2xl border border-stone-200 bg-neutral-50 space-y-3">
+<p class="text-xs font-mono text-stone-500">bg-[#c1ff72] rounded-full</p>
+<button class="group flex items-center gap-3 bg-[#c1ff72] hover:bg-[#b0f060] transition-all text-sm font-semibold rounded-full px-8 py-4 w-fit shadow-lg hover:shadow-[0_0_20px_rgba(193,255,114,0.3)] text-stone-900"><span>Agendar Demo</span><iconify-icon icon="lucide:arrow-right" class="group-hover:translate-x-1 transition-transform"></iconify-icon></button>
+<p class="text-xs text-stone-400">Default / Hover (bg-[#b0f060] + glow) / Focus / Active / Disabled abaixo</p>
+<button disabled class="flex items-center gap-3 bg-[#c1ff72] text-sm font-semibold rounded-full px-8 py-4 w-fit text-stone-900 opacity-50 cursor-not-allowed"><span>Agendar Demo</span></button>
+</div>
+<div class="p-6 rounded-2xl border border-stone-200 bg-neutral-50 space-y-3">
+<p class="text-xs font-mono text-stone-500">bg-stone-900 / bg-white/50 rounded-full</p>
+<button class="font-medium px-8 py-4 rounded-full transition-transform hover:scale-105 shadow-xl bg-stone-900 text-white hover:bg-stone-800 w-full text-center justify-center flex">Fale com a NectArr</button>
+<button class="backdrop-blur border font-medium px-8 py-4 rounded-full transition-colors bg-white/50 text-stone-900 border-stone-900/10 hover:bg-white/80 w-full text-center justify-center flex">Ver Planos</button>
+<p class="text-xs text-stone-400">Par CTA final — sólido escuro + outline translúcido.</p>
+</div>
+</div>
+
+<p class="text-sm font-montserrat font-semibold text-stone-900 uppercase tracking-wider mb-4">Badges &amp; status</p>
+<div class="flex flex-wrap items-center gap-4 mb-10 p-6 rounded-2xl border border-stone-200 bg-neutral-50">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-medium bg-white border-stone-200 text-stone-600"><span class="w-2 h-2 rounded-full bg-[#c1ff72] animate-pulse"></span>Motor de Crescimento B2B</div>
+<span class="text-[10px] px-2 py-0.5 rounded border font-medium bg-stone-100 text-stone-600 border-stone-200">Enviado</span>
+<span class="bg-[#c1ff72] text-[10px] px-2 py-0.5 rounded border border-[#aae65f] font-medium text-stone-900">Conectado</span>
+<span class="text-[10px] px-2 py-0.5 rounded border font-medium bg-stone-900 text-white border-stone-700">Confirmado</span>
+<span class="text-[#c1ff72] font-semibold text-xs tracking-widest uppercase mb-0 block text-stone-900 bg-stone-100 w-fit px-3 py-1.5 rounded">Nossas Soluções</span>
+<div class="flex items-center gap-3 text-base font-medium text-stone-800 bg-stone-50 px-4 py-2 rounded-lg border border-stone-100"><div class="p-1 rounded bg-[#c1ff72]"><iconify-icon icon="lucide:check" width="14"></iconify-icon></div>Especialistas Nativos</div>
+</div>
+
+<p class="text-sm font-montserrat font-semibold text-stone-900 uppercase tracking-wider mb-4">Cards</p>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+<div class="glass-panel p-4 rounded-xl flex items-center gap-4 shadow-lg max-w-sm w-full">
+<div class="w-10 h-10 rounded-full flex items-center justify-center border shrink-0 bg-lime-50 text-lime-600 border-lime-100"><iconify-icon icon="lucide:mail" width="20"></iconify-icon></div>
+<div class="flex-1 min-w-0"><div class="flex justify-between items-center mb-0.5"><p class="text-xs font-semibold text-stone-900">Email de Prospecção</p><span class="text-[10px] text-stone-400">10m atrás</span></div><p class="text-xs text-stone-500 truncate">Ass: Oportunidade de Parceria...</p></div>
+<span class="text-[10px] px-2 py-0.5 rounded border font-medium bg-stone-100 text-stone-600 border-stone-200">Enviado</span>
+</div>
+<div class="group p-8 border rounded-2xl hover:shadow-xl transition-all duration-300 flex flex-col h-full spotlight-card bg-neutral-50 border-stone-200 hover:border-stone-300" onmousemove="handleSpotlight(event)">
+<div class="w-14 h-14 rounded-xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300 bg-white text-stone-900 shadow-sm border border-stone-100"><iconify-icon icon="lucide:database" width="28"></iconify-icon></div>
+<h3 class="text-2xl font-semibold tracking-tight mb-3 text-stone-900">Geração de Leads B2B</h3>
+<p class="text-stone-500 leading-relaxed text-sm lg:text-base">Identificamos e enriquecemos listas de empresas que se encaixam perfeitamente no seu ICP.</p>
+</div>
+<div class="group relative overflow-hidden bg-lime-100/80 rounded-[32px] p-6 lg:p-10 flex flex-col justify-between min-h-[350px] transition-transform hover:scale-[1.01] duration-300 border border-lime-200">
+<div class="relative w-full h-32 mb-4"><div class="absolute right-0 top-0 space-y-3 w-full max-w-[220px]">
+<div class="bg-white p-3 rounded-2xl rounded-tr-none shadow-sm text-xs text-stone-600 ml-auto w-fit">Olá, gostaria de saber mais sobre o plano Enterprise.</div>
+<div class="bg-[#002f43] p-3 rounded-2xl rounded-tl-none shadow-sm text-xs text-white w-fit">Claro! Vamos agendar uma demo?</div>
+</div></div>
+<div class="mt-auto relative z-20"><div class="w-10 h-10 rounded-xl bg-white/60 backdrop-blur flex items-center justify-center mb-4 text-stone-900"><iconify-icon icon="lucide:message-circle" width="20"></iconify-icon></div>
+<h3 class="lg:text-2xl text-xl font-bold text-stone-900 font-montserrat mb-2">NectArr Chat</h3>
+<p class="text-stone-700 text-sm mb-4 leading-relaxed">Centralize WhatsApp e site num só lugar.</p></div>
+</div>
+</div>
+<div class="p-6 rounded-2xl border border-dashed border-stone-300 bg-white">
+<p class="text-sm font-semibold text-stone-900 font-montserrat">Inputs</p>
+<p class="text-sm text-stone-500 mt-1">A página de referência não contém inputs, selects ou textareas — seção de estados de formulário omitida por fidelidade (sem invenção).</p>
+</div>
+</section>
+
+<!-- ============ 4 — LAYOUT ============ -->
+<section id="layout" class="max-w-[1600px] mx-auto px-6 lg:px-12 mb-12 lg:mb-20">
+<p class="ds-section-label text-stone-400 mb-2">04 — Layout &amp; Spacing</p>
+<h2 class="text-3xl lg:text-5xl font-medium text-stone-900 tracking-tight font-montserrat mb-10 lg:mb-12">Layout e espaçamento</h2>
+<div class="space-y-6">
+<div class="border border-stone-200 rounded-2xl bg-neutral-50 p-6">
+<p class="text-xs font-mono text-stone-500 mb-4">Pattern A — Hero · max-w-[1600px] mx-auto px-6 lg:px-12 · grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 · pt-8 lg:pt-16 pb-12 lg:pb-16 · items-center</p>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center border border-dashed border-stone-300 rounded-xl p-4">
+<div class="lg:col-span-7 bg-white border border-stone-200 rounded-lg p-4"><p class="text-xs font-semibold text-stone-900 font-montserrat">lg:col-span-7</p><p class="text-xs text-stone-500">Badge + H1 + paragraph + CTA + social proof.</p></div>
+<div class="lg:col-span-5 bg-stone-900 rounded-lg p-4"><p class="text-xs font-semibold text-white font-montserrat">lg:col-span-5</p><p class="text-xs text-stone-400">3× .glass-panel notification cards + lime blur.</p></div>
+</div>
+</div>
+<div class="border border-stone-200 rounded-2xl bg-neutral-50 p-6">
+<p class="text-xs font-mono text-stone-500 mb-4">Pattern B — Products · grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 auto-rows-fr · rounded-[32px] p-6 lg:p-10</p>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 auto-rows-fr">
+<div class="bg-[#002f43] rounded-[32px] p-6 min-h-[160px]"><p class="text-xs font-semibold text-white font-montserrat">row-span-1 lg:row-span-2 · dark</p></div>
+<div class="bg-lime-300 rounded-[32px] p-6 min-h-[160px] md:col-span-2"><p class="text-xs font-semibold text-stone-900 font-montserrat">md:col-span-2 · wide</p></div>
+<div class="bg-lime-100/80 border border-lime-200 rounded-[32px] p-6 min-h-[160px]"><p class="text-xs font-semibold text-stone-900 font-montserrat">mint</p></div>
+<div class="bg-sky-50 border border-sky-100 rounded-[32px] p-6 min-h-[160px]"><p class="text-xs font-semibold text-stone-900 font-montserrat">sky</p></div>
+</div>
+</div>
+<div class="border border-stone-200 rounded-2xl bg-neutral-50 p-6">
+<p class="text-xs font-mono text-stone-500 mb-4">Pattern C — Stats · grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 · bg-neutral-50 border-stone-200 rounded-2xl p-4 lg:p-6 · mb-12 lg:mb-20</p>
+<div class="grid grid-cols-2 lg:grid-cols-4 p-4 lg:p-6 bg-white font-montserrat border-stone-200 border rounded-2xl shadow-sm gap-6 lg:gap-8">
+<div class="space-y-1 text-center lg:text-left"><h3 class="text-3xl lg:text-4xl font-semibold tracking-tighter text-stone-900">R$ 45M+</h3><p class="text-sm font-medium text-stone-500">Pipeline Gerado</p></div>
+<div class="space-y-1 text-center lg:text-left"><h3 class="text-3xl lg:text-4xl font-semibold tracking-tighter text-stone-900">120+</h3><p class="text-sm text-stone-500 font-medium">Empresas Atendidas</p></div>
+<div class="space-y-1 text-center lg:text-left"><h3 class="text-3xl lg:text-4xl font-semibold tracking-tighter text-stone-900">15x</h3><p class="text-sm text-stone-500 font-medium">ROI Médio</p></div>
+<div class="space-y-1 text-center lg:text-left"><h3 class="text-3xl lg:text-4xl font-semibold tracking-tighter text-stone-900">3.4k</h3><p class="text-sm text-stone-500 font-medium">Reuniões Agendadas</p></div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 5 — MOTION ============ -->
+<section id="motion" class="max-w-[1600px] mx-auto px-6 lg:px-12 mb-12 lg:mb-20">
+<p class="ds-section-label text-stone-400 mb-2">05 — Motion</p>
+<h2 class="text-3xl lg:text-5xl font-medium text-stone-900 tracking-tight font-montserrat mb-10 lg:mb-12">Motion e interação</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="p-6 rounded-2xl border border-stone-200 bg-neutral-50"><p class="text-xs font-mono text-stone-500 mb-3">animate-clip-in · 1.2s cubic-bezier(0.25,1,0.5,1) both</p><div class="animate-clip-in bg-stone-900 text-[#c1ff72] rounded-xl px-6 py-4 text-sm font-semibold">Hero entrance (clip-path inset)</div></div>
+<div class="p-6 rounded-2xl border border-stone-200 bg-neutral-50"><p class="text-xs font-mono text-stone-500 mb-3">animate-fade-up · 0.8s ease-out forwards</p><div class="animate-fade-up bg-white border border-stone-200 rounded-xl px-6 py-4 text-sm font-semibold text-stone-900"> fadeUp translateY(20px)→0</div></div>
+<div class="p-6 rounded-2xl border border-stone-200 bg-neutral-50"><p class="text-xs font-mono text-stone-500 mb-3">animate-float · 6s ease-in-out infinite</p><div class="animate-float glass-panel rounded-xl px-6 py-4 text-sm font-semibold text-stone-900 w-fit">Floating card (±10px)</div></div>
+<div class="p-6 rounded-2xl border border-stone-200 bg-neutral-50 overflow-hidden"><p class="text-xs font-mono text-stone-500 mb-3">animate-marquee · 40s linear infinite</p><div class="overflow-hidden w-full relative"><div class="flex w-max animate-marquee"><div class="flex px-4 items-center gap-12 opacity-60"><span class="font-bold">SaaSforce</span><span class="font-bold">TechFlow</span><span class="font-bold">DataScale</span></div><div class="flex px-4 items-center gap-12 opacity-60 ml-12"><span class="font-bold">SaaSforce</span><span class="font-bold">TechFlow</span><span class="font-bold">DataScale</span></div></div></div></div>
+<div class="p-6 rounded-2xl border border-stone-200 bg-neutral-50"><p class="text-xs font-mono text-stone-500 mb-3">animate-pulse-slow · pulse 4s + animate-pulse</p><div class="flex items-center gap-3"><div class="w-16 h-16 bg-[#c1ff72] rounded-full blur-xl opacity-20 animate-pulse-slow"></div><span class="w-2 h-2 rounded-full bg-[#c1ff72] animate-pulse"></span><span class="text-sm text-stone-600">Glow + dot</span></div></div>
+<div class="p-6 rounded-2xl border border-stone-200 bg-neutral-50"><p class="text-xs font-mono text-stone-500 mb-3">hover:scale-[1.01] · group-hover translate · duration-300/500</p><div class="group bg-[#002f43] rounded-xl p-4 transition-transform hover:scale-[1.01] duration-300"><p class="text-white text-sm font-semibold group-hover:-translate-y-1 transition-transform duration-500">Hover me — lifts &amp; scales</p></div></div>
+<div class="group p-8 border rounded-2xl hover:shadow-xl transition-all duration-300 flex flex-col h-full spotlight-card bg-neutral-50 border-stone-200 hover:border-stone-300 md:col-span-2 lg:col-span-1" onmousemove="handleSpotlight(event)">
+<p class="text-xs font-mono text-stone-500 mb-3">.spotlight-card · radial 800px at var(--mouse-x/--mouse-y) rgba(193,255,114,0.15) · opacity transition 0.5s</p>
+<p class="text-sm text-stone-600">Move o cursor sobre este card — o brilho segue o mouse (JS handleSpotlight).</p>
+</div>
+<div class="p-6 rounded-2xl border border-stone-200 bg-neutral-50"><p class="text-xs font-mono text-stone-500 mb-3">.glass-button .button-shine · 400–500ms</p><button class="glass-button cursor-pointer text-base rounded-full relative group"><span class="relative block select-none font-semibold tracking-tight px-8 py-4 text-lg text-stone-900">Agende uma call estratégica</span><div class="button-shine"></div></button></div>
+<div class="p-6 rounded-2xl border border-stone-200 bg-neutral-50"><p class="text-xs font-mono text-stone-500 mb-3">animate-bounce · typing dots (delay 0 / 0.1s / 0.2s)</p><div class="bg-white p-3 rounded-2xl shadow-sm w-fit"><div class="flex gap-1"><span class="w-1 h-1 bg-stone-400 rounded-full animate-bounce"></span><span class="w-1 h-1 bg-stone-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></span><span class="w-1 h-1 bg-stone-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></span></div></div></div>
+</div>
+</section>
+
+<!-- ============ 6 — ICONS ============ -->
+<section id="icons" class="max-w-[1600px] mx-auto px-6 lg:px-12 mb-12 lg:mb-20">
+<p class="ds-section-label text-stone-400 mb-2">06 — Icons</p>
+<h2 class="text-3xl lg:text-5xl font-medium text-stone-900 tracking-tight font-montserrat mb-10 lg:mb-12">Ícones (iconify-icon · Lucide + Simple Icons)</h2>
+<div class="border border-stone-200 rounded-2xl bg-neutral-50 p-6 lg:p-10">
+<p class="text-xs font-mono text-stone-500 mb-6">&lt;iconify-icon icon="lucide:*" width="…"&gt; · herda color do pai · tamanhos 14 / 16 / 20 / 24 / 28</p>
+<div class="flex flex-wrap gap-6 items-center mb-8">
+<span class="flex flex-col items-center gap-2 text-xs text-stone-500"><span class="w-14 h-14 rounded-xl bg-white border border-stone-100 flex items-center justify-center text-stone-900 shadow-sm"><iconify-icon icon="lucide:arrow-right" width="28"></iconify-icon></span>arrow-right · 28</span>
+<span class="flex flex-col items-center gap-2 text-xs text-stone-500"><span class="w-14 h-14 rounded-xl bg-white border border-stone-100 flex items-center justify-center text-stone-900 shadow-sm"><iconify-icon icon="lucide:database" width="28"></iconify-icon></span>database · 28</span>
+<span class="flex flex-col items-center gap-2 text-xs text-stone-500"><span class="w-14 h-14 rounded-xl bg-[#c1ff72]/20 border border-[#c1ff72]/20 flex items-center justify-center text-stone-900"><iconify-icon icon="lucide:users" width="28"></iconify-icon></span>users · 28</span>
+<span class="flex flex-col items-center gap-2 text-xs text-stone-500"><span class="w-14 h-14 rounded-xl bg-white border border-stone-100 flex items-center justify-center text-stone-900 shadow-sm"><iconify-icon icon="lucide:mail-check" width="28"></iconify-icon></span>mail-check · 28</span>
+<span class="flex flex-col items-center gap-2 text-xs text-stone-500"><span class="w-12 h-12 rounded-2xl bg-white/40 flex items-center justify-center text-stone-900"><iconify-icon icon="lucide:layout-grid" width="24"></iconify-icon></span>layout-grid · 24</span>
+<span class="flex flex-col items-center gap-2 text-xs text-stone-500"><span class="w-10 h-10 rounded-full bg-lime-50 border border-lime-100 flex items-center justify-center text-lime-600"><iconify-icon icon="lucide:mail" width="20"></iconify-icon></span>mail · 20</span>
+<span class="flex flex-col items-center gap-2 text-xs text-stone-500"><span class="w-10 h-10 rounded-full bg-[#c1ff72] border border-lime-600 flex items-center justify-center text-stone-900"><iconify-icon icon="lucide:linkedin" width="20"></iconify-icon></span>linkedin · 20</span>
+<span class="flex flex-col items-center gap-2 text-xs text-stone-500"><span class="w-10 h-10 rounded-full bg-stone-900 border border-stone-800 flex items-center justify-center text-[#c1ff72]"><iconify-icon icon="lucide:calendar-check" width="20"></iconify-icon></span>calendar-check · 20</span>
+<span class="flex flex-col items-center gap-2 text-xs text-stone-500"><span class="w-10 h-10 rounded-xl bg-white/60 flex items-center justify-center text-stone-900"><iconify-icon icon="lucide:message-circle" width="20"></iconify-icon></span>message-circle · 20</span>
+<span class="flex flex-col items-center gap-2 text-xs text-stone-500"><span class="w-10 h-10 rounded-xl bg-white/60 flex items-center justify-center text-stone-900"><iconify-icon icon="lucide:shopping-bag" width="20"></iconify-icon></span>shopping-bag · 20</span>
+<span class="flex flex-col items-center gap-2 text-xs text-stone-500"><span class="p-1 rounded bg-[#c1ff72] text-stone-900 flex"><iconify-icon icon="lucide:check" width="14"></iconify-icon></span>check · 14</span>
+<span class="flex flex-col items-center gap-2 text-xs text-stone-500"><span class="text-stone-900 flex"><iconify-icon icon="lucide:chevron-right" width="16"></iconify-icon></span>chevron-right · 16</span>
+</div>
+<div class="flex flex-wrap gap-6 items-center text-stone-900">
+<span class="flex items-center gap-2 text-xl lg:text-2xl font-bold font-sans"><iconify-icon icon="lucide:cloud-lightning"></iconify-icon> SaaSforce</span>
+<span class="flex items-center gap-2 text-xl lg:text-2xl font-bold font-sans"><iconify-icon icon="lucide:cpu"></iconify-icon> TechFlow</span>
+<span class="flex items-center gap-2 text-xl lg:text-2xl font-bold font-sans"><iconify-icon icon="lucide:database"></iconify-icon> DataScale</span>
+<span class="flex items-center gap-2 text-xl lg:text-2xl font-bold font-sans"><iconify-icon icon="lucide:globe"></iconify-icon> VentureCorp</span>
+<span class="flex items-center gap-2 text-sm text-stone-400"><iconify-icon icon="simple-icons:linkedin" width="14"></iconify-icon> LinkedIn</span>
+<span class="flex items-center gap-2 text-sm text-stone-400"><iconify-icon icon="simple-icons:instagram" width="14"></iconify-icon> Instagram</span>
+</div>
+<p class="text-xs text-stone-400 font-montserrat mt-6">Herança de cor: o ícone assume <span class="font-mono">currentColor</span> do container (ex.: text-lime-600, text-stone-900, text-[#c1ff72]).</p>
+</div>
+</section>
+
+<footer class="max-w-[1600px] mx-auto px-6 lg:px-12 pb-8">
+<div class="border rounded-3xl p-8 lg:p-12 shadow-sm bg-neutral-50 border-stone-200">
+<div class="flex flex-col lg:flex-row gap-10 lg:gap-16 justify-between">
+<div class="lg:w-1/3 space-y-5">
+<div class="flex gap-2 items-center"><span class="text-2xl font-bold tracking-tighter font-google-sans-flex">Nect<span class="text-lime-500">Arr</span></span></div>
+<p class="text-sm text-stone-500 font-montserrat max-w-sm leading-relaxed">Design System extraído desta página — tipografia, cores, componentes, layout, motion e ícones com as classes originais.</p>
+</div>
+<div class="flex flex-wrap gap-10 lg:gap-20 text-sm">
+<div class="space-y-4"><h3 class="text-xs uppercase font-semibold tracking-wider text-stone-400">Sistema</h3><ul class="space-y-3 text-stone-600"><li><a href="#typography" class="hover:text-stone-900 transition-colors">Tipografia</a></li><li><a href="#colors" class="hover:text-stone-900 transition-colors">Cores</a></li><li><a href="#components" class="hover:text-stone-900 transition-colors">Componentes</a></li></ul></div>
+<div class="space-y-4"><h3 class="text-xs uppercase font-semibold tracking-wider text-stone-400">Fundação</h3><ul class="space-y-3 text-stone-600"><li><a href="#layout" class="hover:text-stone-900 transition-colors">Layout</a></li><li><a href="#motion" class="hover:text-stone-900 transition-colors">Motion</a></li><li><a href="#icons" class="hover:text-stone-900 transition-colors">Ícones</a></li></ul></div>
+</div>
+</div>
+<div class="mt-12 pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-4 text-xs border-stone-200 text-stone-400"><p>© 2026 NectArr Growth — design-system.html</p></div>
+</div>
+</footer>
+
+</div>
+</main>
+</div>
+
+<script>
+function handleSpotlight(e) {
+const rect = e.currentTarget.getBoundingClientRect();
+const x = e.clientX - rect.left;
+const y = e.clientY - rect.top;
+e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
+e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
+}
+</script>
+</body>
+</html>

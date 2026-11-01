@@ -1,8 +1,8 @@
 # PRD — Calculadora de Financiamento Imobiliário
 
-**Versão:** 1.5  
-**Data:** 22 de Outubro de 2026  
-**Status:** v1.3, v1.4 (refatoração Sprints 13–18, 123 testes / 10 arquivos) e v1.5 (Dockerização e Orquestração, Sprints 19–22) implementados e validados  
+**Versão:** 1.6  
+**Data:** 31 de Outubro de 2026  
+**Status:** v1.3, v1.4 (refatoração Sprints 13–18, 123 testes / 10 arquivos) e v1.5 (Dockerização e Orquestração, Sprints 19–22) implementados e validados; v1.6 (Redesign baseado em `design_system/design-system.html`, Sprints 23–28) planejado  
 
 ---
 
@@ -502,6 +502,7 @@ Onde:
 - [x] Paginação de tabelas
 - [x] Plano de refatoração e modularização (v1.4, sem mudança funcional)
 - [x] Plano de Dockerização e Orquestração (v1.5, Sprints 19–22)
+- [x] Plano de Redesign Visual — NectArr Design System (v1.6, Sprints 23–28)
 
 ---
 
@@ -650,4 +651,138 @@ src/
 | Permissão negada ao rodar Nginx como usuário non-root | Alto (container não inicia se tentar usar porta 80 ou `/var/cache/nginx` restrito) | Baixa | Uso da imagem oficial `nginxinc/nginx-unprivileged:stable-alpine` pré-configurada para UID `101` e porta `8080` |
 | Vite Dev Server inacessível fora do container | Médio (`Connection reset` no host) | Alta (se omitido flag) | Passar `--host 0.0.0.0` explicitamente no `CMD` do stage `dev` |
 
-**Status do PRD:** v1.3 implementado e validado; v1.4 (refatoração, §28 + Sprints 13–18) implementado e validado (123 testes Vitest passando em 10 arquivos, OxLint e Prettier limpos, build `dist/` ~460KB); v1.5 (Dockerização, §29 + Sprints 19–22) implementado e validado em 22/10/2026 (containers `app`, `dev` e `test` verificados E2E).
+---
+
+## 30. Plano de Redesign Visual — NectArr Design System (v1.6)
+
+**Motivador (decisão 31/10/2026):** modernização completa da identidade visual e da experiência de interface da Calculadora de Financiamento Imobiliário com base fiel na biblioteca de padrões viva `design_system/design-system.html` (*NectArr — Design System*). **Escopo:** substituição integral da antiga temática `slate/blue/emerald` e fontes `Inter`/`Plus Jakarta Sans` pela linguagem visual NectArr (`Geist` + `Montserrat`, superfícies `neutral`/`stone`, acentos **Brand Lime `#c1ff72`** e **Deep Navy `#002f43`**, `.glass-panel`, `.grid-lines`, `.spotlight-card`, `.glass-button` e animações `clip-in`/`fade-up`/`float`), preservando 100% das regras de negócio, acessibilidade e cobertura dos 123 testes automatizados. Detalhamento executável etapa por etapa em `SPRINTS.md` (Sprints 23–28).
+
+### 30.1 Diagnóstico Visual (Estado Atual v1.5 vs Referência `design-system.html`)
+
+| Dimensão | Estado Atual (v1.5) | Alvo do Redesign (v1.6 — `design-system.html`) |
+|----------|---------------------|------------------------------------------------|
+| **Tipografia** | `Inter` (corpo) + `Plus Jakarta Sans` (títulos) | `Geist` (corpo, números tabulares e display `.font-google-sans-flex` com `letter-spacing: -0.04em`) + `Montserrat` (headings `h2`/`h3`, labels uppercase, parágrafos de apoio e navegação) |
+| **Fundo e Superfícies** | `bg-slate-50` liso; cards `bg-white border-slate-200 rounded-2xl`; header/footer `bg-slate-900` | `bg-neutral-100` (`#f5f5f5`) com grade arquitetônica fixa `.grid-lines` (`40px`, `rgba(0,0,0,0.03)`); header `.glass-panel` (`blur(16px)`); seções/cards `bg-white` (`rounded-[32px]` / `rounded-2xl`) e `bg-neutral-50` (`#fafafa`) com `border-stone-200`; superfícies de destaque em `bg-stone-900`, `bg-[#002f43]` e `bg-[#c1ff72]` |
+| **Paleta Semântica (SAC vs Price)** | SAC em `emerald-600` (`#059669`) e Price em `blue-600` (`#2563eb`) sobre neutros frios `slate-*` | Neutros quentes `stone-*` / `neutral-*`; **SAC** assume a identidade **Brand Lime** (`#c1ff72`, `lime-300`, `lime-100/80`, linha gráfica `#65a30d`) e **Price** assume a identidade **Deep Navy / Sky** (`#002f43`, `sky-50`, `sky-100`, linha gráfica `#002f43`) |
+| **Botões e CTAs** | Botão retangular `bg-blue-600 rounded-xl` e WhatsApp `bg-emerald-600 rounded-xl` | Botões pílula (`rounded-full`) e técnicos (`rounded-lg`/`rounded-xl`): CTA primário `.glass-button` com `.button-shine` ou `bg-stone-900 text-[#c1ff72] hover:bg-stone-800`, e CTA de destaque `bg-[#c1ff72] hover:bg-[#b0f060] text-stone-900 shadow-lg hover:shadow-[0_0_20px_rgba(193,255,114,0.3)]` |
+| **Motion e Microinterações** | Apenas `animate-fadeIn` (`0.35s`) | `animate-clip-in` (`1.2s cubic-bezier(0.25,1,0.5,1)`), `animate-fade-up` (`0.8s`), `animate-float` (`6s`), `animate-pulse-slow`, `.spotlight-card` (brilho radial de `800px` que acompanha `--mouse-x`/`--mouse-y`) e `.button-shine` |
+
+### 30.2 Mapeamento de Tokens Visuais (`design-system.html` → `calculadora-fi`)
+
+#### 1. Tipografia (`01 — Typography`)
+
+| Token / Estilo | Fonte e Classes no Design System | Aplicação no CFI |
+|----------------|----------------------------------|------------------|
+| **Body / Números** | `.font-geist` (`'Geist', sans-serif`) + `.tabular-nums` | Corpo da página (`<body>`), inputs, células de tabelas, valores em R$ e eixos dos gráficos |
+| **Display Accent** | `.font-google-sans-flex` (`'Geist', sans-serif; letter-spacing: -0.04em`) | Wordmark `CFI` no Header/Footer e palavra-chave destacada no título do simulador com sublinhado curvo SVG em `#c1ff72` |
+| **Heading 1 (Hero / Simulador)** | `leading-[0.95] text-4xl sm:text-5xl lg:text-6xl font-medium text-stone-900 tracking-tighter` | Cabeçalho principal do `SimulacaoCard` / seção de abertura |
+| **Heading 2 (Títulos de Seção)** | `text-2xl sm:text-3xl lg:text-4xl font-medium text-stone-900 tracking-tight font-montserrat` | Títulos de "Análise Gráfica Comparativa" e "Entenda os Sistemas de Financiamento" |
+| **Heading 3 · Stats (KPIs)** | `text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-tighter text-stone-900 tabular-nums` | Valores monetários principais em `ResultadoHeader`, `CartaoRecomendacao` e `PreviewPrincipal` |
+| **Heading 3 · Card** | `text-xl lg:text-2xl font-bold text-stone-900 font-montserrat` | Títulos internos dos painéis (`PainelSistema`, `TabelaComparativa`, `CartaoRecomendacao`) |
+| **Paragraph L / M** | `font-montserrat text-stone-500 leading-relaxed text-base lg:text-lg` / `text-sm lg:text-base` | Subtítulos de seção e textos explicativos do conteúdo educativo |
+| **Label / Eyebrow** | `font-semibold text-xs tracking-widest uppercase block text-stone-900 bg-stone-100 w-fit px-3 py-1.5 rounded` ou `text-[#c1ff72] font-mono text-xs uppercase tracking-wider` | Tags de seção ("Guia de Decisão", "Análise Visual", "Fórmula de Cálculo") |
+
+#### 2. Cores e Superfícies (`02 — Colors & Surfaces`)
+
+| Token | Valor / Classe | Uso no CFI |
+|-------|----------------|------------|
+| **Brand Lime** | `#c1ff72` (`bg-[#c1ff72]`, hover `bg-[#b0f060]`, border `#aae65f`) | Cor de marca, seleção de texto (`selection:bg-[#c1ff72]`), badges de economia, indicadores pulsantes, destaques SAC e CTAs |
+| **Deep Navy** | `#002f43` (`bg-[#002f43]`, `text-[#002f43]`) | Identidade visual da Tabela Price (badges, abas ativas, série gráfica Price e acentos secundários) |
+| **Ink / Dark Surface** | `stone-900` (`#1c1917`), `stone-800` (`#292524`) | Textos principais, botões primários escuros (`bg-stone-900 text-[#c1ff72]`), bloco de fórmula matemática e tooltips |
+| **Page Surface** | `bg-neutral-100` (`#f5f5f5`) + `.grid-lines` | Plano de fundo geral da aplicação |
+| **Section / Card Surface** | `bg-white` (`#ffffff`) + `border-stone-200` | Containers principais (`SimulacaoCard`, `ResultadoHeader`, `LineChart`, `AmortizationTable`, `EducationalContent`) |
+| **Panel Surface** | `bg-neutral-50` (`#fafafa`) + `border-stone-200` | Células de KPI, barras de cabeçalho de tabelas, rodapé de paginação e container do `Footer` |
+| **Glass Panel** | `.glass-panel` (`rgba(255,255,255,0.6)`, `backdrop-filter: blur(16px)`, `border: 1px solid rgba(255,255,255,0.5)`) | `Header` fixo/sticky no topo e cards flutuantes/destaques |
+| **Bento Mint / Sky Surfaces** | `bg-lime-100/80 border-lime-200` (SAC) e `bg-sky-50 border-sky-100` (Price) | Superfícies temáticas de recomendação e destaques comparativos |
+
+### 30.3 Derivação Fiel para Inputs e Estados de Formulário
+
+Conforme documentado na seção `03 — Components` do `design-system.html` (*"A página de referência não contém inputs, selects ou textareas — seção de estados de formulário omitida por fidelidade"*), os campos de formulário da calculadora devem ser **derivados estritamente dos tokens existentes na página**, sem inventar cores ou famílias alheias ao sistema:
+
+1. **Container do Campo (`InputField.tsx`):**
+   - Superfície padrão: `bg-neutral-50 border border-stone-200 rounded-xl text-stone-900 font-geist tabular-nums placeholder:text-stone-400`.
+   - Hover: `hover:border-stone-300 hover:bg-white`.
+   - Focus: `focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#c1ff72]/60 focus:border-stone-900`.
+   - Erro de validação: preserva semântica de alerta acessível (`border-red-400 bg-red-50/30 focus:ring-red-500/20 focus:border-red-500` e texto `text-red-600`).
+2. **Labels, Prefixos/Sufixos e Badges de Campo:**
+   - Label: `font-montserrat text-sm font-semibold text-stone-800`.
+   - Prefixo/Sufixo (`R$`, `%`): `text-stone-400 font-semibold text-sm`.
+   - Badge auxiliar (`% entrada`, `≈ % a.a.`, `anos`): `text-xs font-medium px-2.5 py-0.5 rounded-md bg-stone-100 text-stone-700 border border-stone-200 tabular-nums`.
+3. **Atalhos Rápidos (`DownPaymentShortcuts.tsx`, `TermShortcuts.tsx`):**
+   - Pílula ativa: `bg-stone-900 text-[#c1ff72] border border-stone-900` (token do botão primário do Header NectArr).
+   - Pílula inativa: `bg-stone-100 text-stone-600 border border-stone-200 hover:bg-stone-200 hover:text-stone-900`.
+   - Pílula desabilitada (`valorImovel <= 0`): `bg-stone-100 text-stone-400 border border-stone-200/60 cursor-not-allowed`.
+4. **Preview do Principal (`PrincipalPreview.tsx`):**
+   - Estilizado como o *Pattern C — Stats* e *Notification Card* do Hero: `rounded-2xl bg-neutral-50 border border-stone-200 px-5 py-3.5` com dot `w-2.5 h-2.5 rounded-full bg-[#c1ff72] border border-lime-600` e valor principal em `text-lg font-semibold tracking-tighter text-stone-900 tabular-nums`.
+5. **Botão "Calcular" (`FormCalculator.tsx`):**
+   - Habilitado (`isValid === true`): botão pílula `rounded-full` combinando o token primário NectArr (`bg-stone-900 text-[#c1ff72] hover:bg-stone-800 shadow-lg hover:shadow-[0_0_20px_rgba(193,255,114,0.25)]` com `.button-shine` sutil).
+   - Desabilitado (`isValid === false`): `bg-stone-200 text-stone-400 rounded-full cursor-not-allowed`.
+
+### 30.4 Especificação por Componente e Seção
+
+```text
+calculadora-fi/
+├── index.html                                    # Fontes Geist + Montserrat; theme-color #1c1917
+├── public/
+│   ├── favicon.svg                               # Atualizado para paleta #1c1917 + #c1ff72 + #002f43
+│   └── og-image.svg                              # Atualizado para identidade NectArr
+└── src/
+    ├── index.css                                 # @theme / utilitários: .glass-panel, .grid-lines, .spotlight-card, .glass-button, animações
+    ├── App.tsx                                   # bg-neutral-100 + .grid-lines fixo + selection:bg-[#c1ff72]
+    ├── utils/
+    │   ├── chart.ts                              # COR_SAC (#65a30d / lime fill) + COR_PRICE (#002f43 / navy fill) + Geist tooltip
+    │   └── spotlight.ts                          # NOVO helper: handleSpotlightMouseMove para atualizar --mouse-x / --mouse-y
+    └── components/
+        ├── layout/
+        │   ├── Header.tsx                        # .glass-panel sticky, wordmark CFI font-google-sans-flex, pill status #c1ff72
+        │   ├── Main.tsx                          # Container max-w-6xl px-4 sm:px-6 lg:px-12 relative z-10
+        │   ├── SimulationCard.tsx                # Hero header editorial + sublinhado curvo SVG #c1ff72 + surface rounded-[32px]
+        │   └── Footer.tsx                        # Card rounded-3xl bg-neutral-50 border-stone-200 p-8 lg:p-12
+        ├── ui/
+        │   ├── InputField.tsx / FormField.tsx    # Tokens stone/neutral + focus ring #c1ff72/stone-900
+        │   ├── Pagination.tsx                    # Barra bg-neutral-50 border-stone-200 + botões hover stone-900/#c1ff72
+        │   └── FadeIn.tsx                        # Suporte a animate-fade-up / animate-clip-in com motion-reduce
+        ├── form/
+        │   ├── FormCalculator.tsx                # Grid de campos + botão Calcular rounded-full stone-900/#c1ff72
+        │   ├── DownPaymentShortcuts.tsx          # Pílulas stone-900 text-[#c1ff72] (ativo) / stone-100 (inativo)
+        │   ├── TermShortcuts.tsx                 # Pílulas stone-900 text-[#c1ff72] (ativo) / stone-100 (inativo)
+        │   └── PrincipalPreview.tsx              # Card Pattern C Stats bg-neutral-50 border-stone-200
+        ├── results/
+        │   ├── RecommendationCard.tsx            # Card destaque Bento (stone-900 / lime-100 / sky-50) + badge #c1ff72
+        │   ├── ResultHeader.tsx                  # .spotlight-card + KPIs Pattern C + barra de composição stone-900/#c1ff72/#002f43
+        │   ├── WhatsAppShareButton.tsx           # CTA pílula bg-[#c1ff72] hover:bg-[#b0f060] text-stone-900 rounded-full
+        │   ├── ChartsGrid.tsx / LineChart.tsx    # .spotlight-card + legenda #c1ff72 vs #002f43 + eixos Geist
+        │   ├── TableTabs.tsx / ExportCSVButton   # Segmented control stone-200/70 + abas stone-900/#002f43 + botão CSV
+        │   └── AmortizationTable.tsx             # Estilo .ds-spec-table + hover:bg-[#c1ff72]/15
+        └── education/
+            ├── EducationalContent.tsx            # Eyebrow bg-stone-100 + título font-montserrat + card rounded-3xl
+            ├── EducationTabs.tsx                 # Segmented control SAC / Price / Comparação
+            ├── SystemPanel.tsx                   # Checkboxes bg-[#c1ff72] + bloco de fórmula dark bg-stone-900
+            └── ComparisonTable.tsx               # Tabela .ds-spec-table bg-neutral-50 border-stone-200
+```
+
+### 30.5 Requisitos do Redesign
+
+| ID | Requisito | Prioridade | Critério de Aceite |
+|----|-----------|------------|-------------------|
+| RDS-001 | Tipografia NectArr (`Geist` + `Montserrat`) | Must | `index.html` carrega `Geist` e `Montserrat`; classes `.font-geist`, `.font-montserrat` e `.font-google-sans-flex` aplicadas conforme escala tipográfica do `design-system.html` |
+| RDS-002 | Superfícies, Cores e Grade de Fundo | Must | Página usa `bg-neutral-100`, `.grid-lines` fixo, `.glass-panel` no Header e paleta `stone-*` + `#c1ff72` (Brand Lime) + `#002f43` (Deep Navy); zero classes residuais `slate-*`, `blue-*` ou `emerald-*` em componentes |
+| RDS-003 | Identidade Visual SAC vs Price | Must | SAC representado consistentemente por Brand Lime (`#c1ff72` / `lime-*` / `#65a30d`) e Price por Deep Navy (`#002f43` / `sky-*`) nos cards, badges, gráficos, abas e guia educativo |
+| RDS-004 | Microinterações e Motion | Should | Cards principais (`ResultHeader`, `LineChart`) implementam `.spotlight-card` com tracking de mouse (`--mouse-x`, `--mouse-y`); animações `clip-in` / `fade-up` respeitam `prefers-reduced-motion` |
+| RDS-005 | Derivação de Formulário e Atalhos | Must | `InputField`, `AtalhosEntrada`, `AtalhosPrazo`, `PreviewPrincipal` e botão `Calcular` seguem a derivação da §30.3 mantendo `inputMode="numeric"`, `aria-*` e `disabled={!isValid}` |
+| RDS-006 | Gráficos Chart.js Alinhados ao Design System | Must | `utils/chart.ts` e `LineChart.tsx` usam `Geist`, cores `COR_SAC`/`COR_PRICE` da nova paleta e tooltip `stone-900` |
+| RDS-007 | Tabelas no Padrão `.ds-spec-table` | Must | `AmortizationTable` e `ComparisonTable` aplicam cabeçalhos uppercase `font-montserrat`, divisores `divide-stone-200` e paginação estilizada com `stone-900`/`#c1ff72` |
+| RDS-008 | Preservação Integral de Testes e Regras de Negócio | Must | Todos os 123 testes Vitest existentes (e novos testes de componentes, se adicionados) passam sem quebra de contrato funcional |
+| RDS-009 | Acessibilidade e Contraste (WCAG AA) | Must | Textos sobre `#c1ff72` usam exclusivamente `text-stone-900` (alto contraste); textos sobre `bg-stone-900` ou `bg-[#002f43]` usam `text-white` ou `text-[#c1ff72]`; `role`, `aria-label`, `aria-selected` e `aria-invalid` intactos |
+| RDS-010 | Atualização de Assets e Evidências Visuais | Should | `favicon.svg`, `og-image.svg` e capturas em `docs/screenshots/*.png` atualizados para refletir o novo design |
+
+### 30.6 Riscos e Mitigações (Redesign v1.6)
+
+| Risco | Impacto | Probabilidade | Mitigação |
+|-------|---------|---------------|-----------|
+| Baixo contraste de `#c1ff72` puro quando usado como cor de texto ou linha sobre fundo branco | Médio (prejudica leitura de valores ou linha SAC no gráfico) | Alta (se aplicado sem ajuste) | Usar `#c1ff72` apenas como *background* com texto `text-stone-900`, ou como texto sobre fundo escuro (`bg-stone-900`); em fundos claros (textos/linhas de gráfico), usar `text-lime-700`/`text-lime-800` e `COR_SAC = '#65a30d'` com preenchimento `rgba(193, 255, 114, 0.22)` |
+| Quebra de testes automatizados (`FormCalculator.test.tsx`, `AmortizationTable.test.tsx`) | Alto | Baixa | Preservar todos os rótulos (`Valor do Imóvel`, `Entrada`, `Taxa de Juros Mensal`, `Prazo (meses)`), nomes de botões (`Calcular`, `20% (Mín.)`, `360m (30a)`, `Página anterior`, `Próxima página`) e textos de paginação (`Página X de Y`) |
+| Overhead de performance com `.spotlight-card` em dispositivos móveis/touch | Baixo | Baixa | Efeito `.spotlight-card::before` só fica visível em `:hover` e atualiza CSS variables leves (`--mouse-x`, `--mouse-y`) diretamente no elemento via `currentTarget.style.setProperty` sem causar re-render no React |
+| Aumento do tamanho do bundle acima de 500KB (NFR-006) | Médio | Baixa | Não instalar bibliotecas pesadas de ícones ou UI (manter SVGs inline leves inspirados em Lucide, como já feito no projeto, e CSS nativo/Tailwind v4) |
+
+**Status do PRD:** v1.3 implementado e validado; v1.4 (refatoração, §28 + Sprints 13–18) implementado e validado (123 testes Vitest passando em 10 arquivos, OxLint e Prettier limpos, build `dist/` ~460KB); v1.5 (Dockerização, §29 + Sprints 19–22) implementado e validado em 22/10/2026; v1.6 (Redesign NectArr Design System, §30 + Sprints 23–28) especificado e pronto para execução incremental.
