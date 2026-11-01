@@ -11,10 +11,13 @@ export function GradeGraficos({ dados }: GradeGraficosProps) {
     <section aria-label="Análise gráfica comparativa" className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-1">
         <div>
-          <h3 className="text-lg sm:text-xl font-bold text-slate-900">
+          <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest bg-stone-100 text-stone-900 font-montserrat mb-3">
+            Análise visual
+          </span>
+          <h3 className="text-lg sm:text-xl font-medium text-stone-900 tracking-tight font-montserrat">
             Análise Gráfica Comparativa
           </h3>
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-stone-500 font-montserrat">
             Comportamento das prestações, juros, amortização e evolução da dívida mês a mês.
           </p>
         </div>

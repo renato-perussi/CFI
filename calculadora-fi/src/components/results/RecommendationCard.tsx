@@ -22,51 +22,54 @@ export function CartaoRecomendacao({ dados }: CartaoRecomendacaoProps) {
 
   return (
     <div
-      className={`p-6 md:p-7 rounded-2xl border transition-all duration-300 ${
+      className={`relative overflow-hidden rounded-[32px] p-6 md:p-8 border transition-all ${
         isSAC
-          ? 'border-emerald-200 bg-gradient-to-br from-emerald-50/90 via-white to-emerald-50/40'
-          : 'border-blue-200 bg-gradient-to-br from-blue-50/90 via-white to-blue-50/40'
+          ? 'bg-stone-900 text-white border-stone-800'
+          : 'bg-[#002f43] text-white border-sky-900'
       }`}
     >
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div
+        className={`pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full blur-3xl ${
+          isSAC ? 'bg-[#c1ff72]/15' : 'bg-sky-400/15'
+        }`}
+        aria-hidden="true"
+      />
+      <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
             <span
+              aria-hidden="true"
               className={`inline-flex items-center justify-center w-8 h-8 rounded-xl text-sm font-bold shadow-xs shrink-0 ${
-                isSAC ? 'bg-emerald-600 text-white' : 'bg-blue-600 text-white'
+                isSAC ? 'bg-[#c1ff72] text-stone-900' : 'bg-white text-[#002f43]'
               }`}
             >
               ✓
             </span>
             <div>
-              <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 block">
+              <span className="text-xs font-semibold uppercase tracking-widest text-stone-300 block font-montserrat">
                 Recomendação Financeira
               </span>
-              <h3 className="text-lg sm:text-xl font-bold text-slate-900">
+              <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight">
                 Melhor opção: {dados.melhorOpcao}
               </h3>
             </div>
           </div>
 
-          <p className="text-slate-700 text-sm sm:text-base sm:pl-11">
+          <p className="text-stone-200 text-sm sm:text-base sm:pl-11">
             Economia total de{' '}
-            <strong
-              className={`font-extrabold tabular-nums ${
-                isSAC ? 'text-emerald-700' : 'text-blue-700'
-              }`}
-            >
+            <strong className="font-extrabold tabular-nums text-[#c1ff72]">
               {formatarMoeda(dados.economia)}
             </strong>{' '}
-            <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 tabular-nums">
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#c1ff72] text-stone-900 border border-[#aae65f] tabular-nums">
               -{percentualEconomia}%
             </span>{' '}
             em relação ao outro sistema.
           </p>
 
           {mesCruzamento && dados.economia > 0 && (
-            <p className="text-xs sm:text-sm text-slate-600 sm:pl-11">
+            <p className="text-xs sm:text-sm text-stone-300 sm:pl-11">
               Ponto de equilíbrio: a partir do{' '}
-              <strong className="font-semibold text-slate-800">{mesCruzamento}º mês</strong> (de{' '}
+              <strong className="font-semibold text-white">{mesCruzamento}º mês</strong> (de{' '}
               {dados.resultadoSAC.tabela.length}), a parcela mensal do SAC passa a ser menor que a
               parcela fixa da Price.
             </p>

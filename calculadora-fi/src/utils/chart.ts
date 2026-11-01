@@ -26,17 +26,17 @@ export function registerChart(): void {
 }
 
 /** Paleta SAC/Price dos gráficos. */
-export const COR_SAC = '#059669';
-export const COR_SAC_BG = 'rgba(5, 150, 105, 0.08)';
-export const COR_PRICE = '#2563eb';
-export const COR_PRICE_BG = 'rgba(37, 99, 235, 0.08)';
+export const COR_SAC = '#65a30d';
+export const COR_SAC_BG = 'rgba(193, 255, 114, 0.22)';
+export const COR_PRICE = '#002f43';
+export const COR_PRICE_BG = 'rgba(0, 47, 67, 0.08)';
 
 /** Tooltip padrão pt-BR dos gráficos de linha. */
 export function criarTooltipPadrao() {
   return {
-    backgroundColor: '#0f172a',
-    titleFont: { family: 'Inter, sans-serif', size: 12, weight: 600 },
-    bodyFont: { family: 'Inter, sans-serif', size: 12 },
+    backgroundColor: '#1c1917',
+    titleFont: { family: 'Geist, sans-serif', size: 12, weight: 600 },
+    bodyFont: { family: 'Geist, sans-serif', size: 12 },
     padding: 12,
     cornerRadius: 10,
     displayColors: true,

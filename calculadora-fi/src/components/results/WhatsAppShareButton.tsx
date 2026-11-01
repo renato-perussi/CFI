@@ -42,7 +42,7 @@ export function WhatsAppShareButton({ dados }: WhatsAppShareButtonProps) {
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold py-2.5 px-4 rounded-xl shadow-xs hover:shadow transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 shrink-0"
+      className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-semibold text-sm bg-[#c1ff72] hover:bg-[#b0f060] text-stone-900 shadow-lg hover:shadow-[0_0_20px_rgba(193,255,114,0.3)] transition-all focus:outline-none focus:ring-2 focus:ring-white/70 focus:ring-offset-2 focus:ring-offset-stone-900 shrink-0"
       aria-label="Compartilhar resultados via WhatsApp"
     >
       <svg
