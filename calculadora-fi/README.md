@@ -20,6 +20,7 @@ Ferramenta gratuita e acessivel para simular e comparar financiamentos imobiliar
 - Tailwind CSS 4
 - Chart.js + react-chartjs-2
 - Vitest (testes)
+- NectArr Design System (Geist + Montserrat, Brand Lime `#c1ff72`, Deep Navy `#002f43`)
 
 ## Inicio Rapido
 

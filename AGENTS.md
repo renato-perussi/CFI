@@ -10,7 +10,7 @@ Single app lives in `calculadora-fi/`. Run ALL npm commands there, never at root
 - `npx vitest run <path>` — single suite, e.g. `npx vitest run src/utils/calculations.test.ts`
 - `npm run lint` / `npm run lint:fix` — OxLint (not ESLint; rules in `.oxlintrc.json`)
 - `npm run format` / `npm run format:check` — Prettier, scope is only `src/**/*.{ts,tsx,css,json}` (`printWidth: 100`, single quotes, semi, `es5` trailing commas)
-- Requires Node 20+ (Vite 8). `dist/` is gitignored; production build was ~460KB.
+- Requires Node 20+ (Vite 8). `dist/` is gitignored; production build was ~464KB.
 
 ## Docker Commands (from repo root)
 
@@ -37,4 +37,4 @@ Single app lives in `calculadora-fi/`. Run ALL npm commands there, never at root
 - CSV is pt-BR format (`;` separator, `,` decimal, BOM) with `SAC —` / `PRICE —` sections; download helper lives in `utils/csvDownload.ts` (DOM), generation in `utils/csv.ts` (pure). Check Excel/Sheets compat on change.
 - Tailwind is v4 via `@tailwindcss/vite` plugin, not a config file.
 - `docs/screenshots/*.png` are manual browser captures for `README.md`, not generated — redo via `dev` + fill + screenshot if UI changes.
-- `PRD.md` (v1.5) and `SPRINTS.md` (Sprints 1–22; Sprints 19–22 cover Dockerization) are authoritative for scope; root `README.md` is the usage source of truth.
+- `PRD.md` (v1.6) and `SPRINTS.md` (Sprints 1–28; Sprints 19–22 cover Dockerization, Sprints 23–28 cover the NectArr redesign) are authoritative for scope; root `README.md` is the usage source of truth.

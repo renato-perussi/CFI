@@ -86,7 +86,7 @@ Abas SAC / Price / Comparação com fórmulas e quadro decisório.
 | Testes | Vitest + Testing Library + jsdom | 5.0 + 16.3 |
 | Qualidade | OxLint + Prettier | 1.71 + 3.9 |
 | Containers | Docker Multi-Stage (`node:22-alpine` + `nginxinc/nginx-unprivileged:stable-alpine`) + Docker Compose | — |
-| Fontes | Inter + Plus Jakarta Sans (Google Fonts) | — |
+| Fontes | Geist + Montserrat (Google Fonts, NectArr Design System) | — |
 
 Sem backend. Todos os cálculos são locais no navegador.
 
@@ -220,7 +220,7 @@ Execute dentro de `calculadora-fi/`:
 │   ├── Dockerfile           # Multi-stage (base, dev, check, builder, prod)
 │   ├── nginx.conf           # Configuração SPA, cache, gzip e security headers (porta 8080)
 │   ├── vite.config.ts
-│   ├── dist/                # build (gerado, 460KB em 22/10/2026)
+│   ├── dist/                # build (gerado, 464KB em 01/11/2026)
 │   └── package.json
 ├── docs/
 │   └── screenshots/         # Prints usados neste README
@@ -235,7 +235,7 @@ Execute dentro de `calculadora-fi/`:
 └── README.md                # Este arquivo
 ```
 
-> Documentos de produto em `PRD.md` (v1.5) e `SPRINTS.md` (Sprints 1-22) — ver `## Documentação`.
+> Documentos de produto em `PRD.md` (v1.6) e `SPRINTS.md` (Sprints 1–28) — ver `## Documentação`.
 
 Fórmulas:
 
@@ -256,10 +256,10 @@ Validações exibem mensagens em pt-BR no formulário.
 
 ```bash
 cd calculadora-fi
-npm run test        # 123/123 Vitest passando (10 arquivos) — verificado em 22/10/2026
-npm run lint        # oxlint limpo — verificado em 22/10/2026
+npm run test        # 123/123 Vitest passando (10 arquivos) — verificado em 01/11/2026
+npm run lint        # oxlint limpo — verificado em 01/11/2026
 npm run format:check
-npm run build       # tsc -b + vite build OK — dist/ 460KB (<500KB) em 22/10/2026
+npm run build       # tsc -b + vite build OK — dist/ 464KB (<500KB) em 01/11/2026
 ```
 
 Critérios DoD por sprint: testes passando, build limpo, responsivo (validado em 390px em 22/10/2026; faixa total 320–2560 e cross-browser ainda sem teste formal — ver `SPRINTS.md`).
@@ -277,8 +277,8 @@ npm run dev  # :5173
 
 ## Documentação
 
-- `PRD.md` v1.5 — visão, personas, FR/NFR (+FR-033 a FR-039 pós-MVP), fórmulas, refatoração v1.4 (§28) e Dockerização v1.5 (§29, requisitos DKR-001 a DKR-008) — implementados e validados em 22/10/2026
-- `SPRINTS.md` — Sprints 1–18 (produto + refatoração modular, 123 testes / 10 arquivos) + Sprints 19–22 (Dockerização multi-stage + Nginx non-root + Docker Compose) implementadas e validadas em 22/10/2026
+- `PRD.md` v1.6 — visão, personas, FR/NFR (+FR-033 a FR-039 pós-MVP), fórmulas, refatoração v1.4 (§28), Dockerização v1.5 (§29, requisitos DKR-001 a DKR-008) e Redesign NectArr v1.6 (§30, requisitos RDS-001 a RDS-010) — implementados e validados em 01/11/2026
+- `SPRINTS.md` — Sprints 1–18 (produto + refatoração modular, 123 testes / 10 arquivos) + Sprints 19–22 (Dockerização multi-stage + Nginx non-root + Docker Compose) + Sprints 23–28 (Redesign NectArr Design System) implementadas e validadas em 01/11/2026
 - `calculadora-fi/README.md` — README técnico resumido do app
 
 ## Roadmap
@@ -289,6 +289,7 @@ npm run dev  # :5173
 - [x] Sprint 8: SEO, OG tags, acessibilidade, performance
 - [x] Sprints 12-18: refinos pós-MVP + refatoração modular v1.4 (123 testes)
 - [x] Sprints 19-22: Dockerização multi-stage (`node:22-alpine` + `nginx-unprivileged`) e Docker Compose
+- [x] Sprints 23-28: Redesign NectArr Design System v1.6 (Geist/Montserrat, Brand Lime `#c1ff72`, Deep Navy `#002f43`, 123 testes, Docker verificado, screenshots recapturados)
 - [ ] PWA / salvar simulações localStorage
 - [ ] Comparar com correção INCC/TR
 - [ ] Exportar PDF/XLSX

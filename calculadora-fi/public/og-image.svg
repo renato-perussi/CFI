@@ -1,14 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" fill="none">
-  <rect width="1200" height="630" fill="#0F172A"/>
-  <rect x="60" y="60" width="1080" height="510" rx="28" fill="#1E293B" stroke="#334155" stroke-width="2"/>
-  <rect x="110" y="110" width="64" height="64" rx="16" fill="#2563EB"/>
-  <path d="M142 126L122 142H128V158H138V148H146V158H156V142H162L142 126Z" fill="white"/>
-  <text x="194" y="152" fill="#94A3B8" font-family="Inter, sans-serif" font-size="24" font-weight="600">CFI — Simulador Financeiro</text>
-  <text x="110" y="260" fill="#F8FAFC" font-family="Inter, sans-serif" font-size="52" font-weight="800">Calculadora de Financiamento</text>
-  <text x="110" y="328" fill="#F8FAFC" font-family="Inter, sans-serif" font-size="52" font-weight="800">Imobiliário: SAC vs Price</text>
-  <text x="110" y="400" fill="#CBD5E1" font-family="Inter, sans-serif" font-size="26" font-weight="400">Simule prestações, juros totais, evolução do saldo devedor e descubra a opção mais econômica.</text>
-  <rect x="110" y="455" width="170" height="54" rx="12" fill="#064E3B" stroke="#059669" stroke-width="2"/>
-  <text x="195" y="490" text-anchor="middle" fill="#6EE7B7" font-family="Inter, sans-serif" font-size="22" font-weight="700">Tabela SAC</text>
-  <rect x="300" y="455" width="180" height="54" rx="12" fill="#1E3A8A" stroke="#3B82F6" stroke-width="2"/>
-  <text x="390" y="490" text-anchor="middle" fill="#93C5FD" font-family="Inter, sans-serif" font-size="22" font-weight="700">Tabela Price</text>
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1c1917" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="#f5f5f5"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <rect x="60" y="60" width="1080" height="510" rx="32" fill="#ffffff" stroke="#e7e5e4" stroke-width="2"/>
+  <rect x="110" y="110" width="64" height="64" rx="16" fill="#c1ff72"/>
+  <path d="M142 124L122 141H128V157H138V147H146V157H156V141H162L142 124Z" fill="#1c1917"/>
+  <text x="194" y="152" fill="#57534e" font-family="Montserrat, Geist, sans-serif" font-size="24" font-weight="600">CFI — Simulador NectArr</text>
+  <text x="110" y="262" fill="#1c1917" font-family="Geist, Montserrat, sans-serif" font-size="54" font-weight="600" letter-spacing="-2">Calculadora de Financiamento</text>
+  <text x="110" y="330" fill="#1c1917" font-family="Geist, Montserrat, sans-serif" font-size="54" font-weight="600" letter-spacing="-2">Imobiliário: SAC vs Price</text>
+  <text x="110" y="402" fill="#78716c" font-family="Montserrat, sans-serif" font-size="26" font-weight="400">Simule prestações, juros totais, evolução do saldo devedor e descubra a opção mais econômica.</text>
+  <rect x="110" y="455" width="170" height="54" rx="27" fill="#c1ff72" stroke="#aae65f" stroke-width="2"/>
+  <text x="195" y="490" text-anchor="middle" fill="#1c1917" font-family="Montserrat, sans-serif" font-size="22" font-weight="700">Tabela SAC</text>
+  <rect x="300" y="455" width="180" height="54" rx="27" fill="#002f43"/>
+  <text x="390" y="490" text-anchor="middle" fill="#ffffff" font-family="Montserrat, sans-serif" font-size="22" font-weight="700">Tabela Price</text>
 </svg>

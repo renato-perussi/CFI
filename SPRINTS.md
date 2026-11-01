@@ -1,12 +1,12 @@
 # Sprints — Calculadora de Financiamento Imobiliário
 
 **Projeto:** Calculadora de Financiamento Imobiliário  
-**Base:** PRD v1.3 + v1.4 + v1.5 (implementados e validados em 22/10/2026) + v1.6 (Redesign NectArr Design System — Sprints 23–27 concluídas em 01/11/2026, Sprint 28 planejada)  
+**Base:** PRD v1.3 + v1.4 + v1.5 (implementados e validados em 22/10/2026) + v1.6 (Redesign NectArr Design System — Sprints 23–28 concluídas em 01/11/2026)  
 **Metodologia:** Sprints iterativas com entregas incrementais  
 **Stack Frontend:** React 19 + TypeScript ~6.0 + Tailwind CSS 4.3 + Vite 8.1 (Chart.js 4.5, Vitest 5.0, OxLint 1.71)  
 **Stack Infra/Containers (v1.5):** Docker Multi-Stage (`node:22-alpine` + `nginxinc/nginx-unprivileged:stable-alpine`) + Docker Compose  
 **Design System (v1.6):** NectArr Design System (`design_system/design-system.html` — `Geist` + `Montserrat`, Brand Lime `#c1ff72`, Deep Navy `#002f43`, `stone`/`neutral`, `.glass-panel`, `.spotlight-card`, `.grid-lines`)  
-**Status em 01/11/2026:** Sprints 1–27 implementadas e validadas (123 testes passando em 10 arquivos, OxLint/Prettier limpos, `dist/` ~460KB, containers `app`, `dev` e `test` operacionais, Sprints 23, 25, 26 e 27 com code-audit "Pass"); Sprint 28 planejada para conclusão do redesign v1.6.
+**Status em 01/11/2026:** Sprints 1–28 implementadas e validadas (123 testes passando em 10 arquivos, OxLint/Prettier limpos, `dist/` 464KB, containers `app`, `dev` e `test` operacionais, Sprints 23 e 25–28 com code-audit "Pass"); Redesign v1.6 concluído.
 
 ---
 
@@ -714,9 +714,11 @@
 
 ---
 
-## Sprint 28 — Identidade Estática (`favicon`, `og-image`), Regressão, Screenshots e QA Final v1.6
+## Sprint 28 — Identidade Estática (`favicon`, `og-image`), Regressão, Screenshots e QA Final v1.6 — ✅ Concluída em 01/11/2026
 
 **Objetivo:** Atualizar os assets gráficos estáticos, auditar a remoção completa da temática legada (`slate/blue/emerald`), validar os 123+ testes e o container Docker, e regenerar as capturas de tela oficiais do `README.md` (RDS-002, RDS-008, RDS-010).
+
+**Status:** ✅ Implementada e validada em 01/11/2026 — `npm run lint`, `format:check`, `test` (123/123) e `build` (`dist/` 464KB) passando localmente e no container `test` (exit code `0`); screenshots recapturados via Playwright (form preenchido 50000000/10000000/085/360); auditoria de código com veredito "Pass" (zero findings).
 
 ### Tarefas
 
@@ -733,6 +735,12 @@
 ### Dependências
 - Sprints 23–27 concluídas
 
+> **Notas de implementação (01/11/2026):**
+> - **S28-01:** `favicon.svg` usa tile Brand Lime (`#c1ff72`, superfície CTA do DS §02/§03) com glifos Ink (`#1c1917`) e Deep Navy (`#002f43`) para visibilidade em abas claras/escuras — desvio documentado do "fundo `#1c1917`" literal, mantendo as 3 cores da identidade. `og-image.svg` usa superfície de página `neutral-100` (`#f5f5f5`) + card branco com pílulas SAC Lime e Price Navy.
+> - **S28-02:** zero classes utilitárias legadas (`bg-/text-/border-/from-/to-/via-/ring-` + `slate-/blue-/emerald-`) em `src/`; o padrão ingênuo `rg '(slate|emerald|blue)-'` casa apenas o substring `slate` dentro de `-translate-y-` (`InputField.tsx:47,75` — utilitário de transform, não cor). Zero hex legados (`#0F172B`, `#2563EB`, `#38BDF8`, `#34D399`, `#10B981`) e zero referências a `Inter`/`Plus Jakarta Sans` em `src/` + `index.html`.
+> - **S28-03:** `npm run lint` OK, `format:check` OK, `test` 123/123 OK, `build` OK (`dist/` 464KB < 500KB, inclui `favicon.svg` + `og-image.svg`), `docker compose --profile test run --rm --build test` exit `0` (123/123).
+> - **S28-04:** 6 screenshots recapturados em `docs/screenshots/` com a interface NectArr (valores de referência: SAC R$ 4.511,11 inicial, economia R$ 271.328,70 / -21,1%, equilíbrio 101º mês); `README.md`, `calculadora-fi/README.md`, `AGENTS.md`, `PRD.md` e `SPRINTS.md` atualizados para v1.6.
+
 ---
 
 ## Definição de Pronto (DoD)
@@ -747,7 +755,7 @@ Cada Sprint só será considerada completa quando:
 - [ ] Code review realizado
 - [x] Documentação atualizada — PRD v1.3 + v1.4, SPRINTS (Sprints 1–18), README com screenshots em 22/10/2026
 - [x] Dockerização v1.5 — PRD §29 + SPRINTS 19–22 implementados e validados em 22/10/2026 (`app` healthy non-root na porta 8080, `dev` com HMR na porta 5173, `test` com 123/123 testes passando)
-- [ ] Redesign NectArr Design System v1.6 — PRD §30 + SPRINTS 23–28 (Sprints 23–27 concluídas em 01/11/2026; Sprint 28 planejada)
+- [x] Redesign NectArr Design System v1.6 — PRD §30 + SPRINTS 23–28 (Sprints 23–28 concluídas em 01/11/2026)
 
 > DoD específico das Sprints 13–18 (refatoração segura — **concluído**): sem mudança visual/funcional (RFR-001); `npx vitest run` PASS (123 testes / 10 arquivos); `rg 'replace\(/\\./g'` sem ocorrências fora de `format.ts`; `tsc -b && vite build` OK; `npm run lint` zero errors e `format:check` OK.
 
@@ -901,5 +909,5 @@ Sprint 28 (Assets SVG + Auditoria Cromática + 123 Testes + Screenshots)
 
 ---
 
-**Status em 01/11/2026:** Sprints 1–27 implementadas e validadas (123 testes passando em 10 arquivos, `dist/` ~460KB, Dockerização multi-stage + Docker Compose verificados E2E, Sprints 23, 25, 26 e 27 com code-audit "Pass"). Sprint 28 especificada e pronta para implementação final do Redesign v1.6 (`design_system/design-system.html`).  
-**Próximo passo:** Executar a Sprint 28 (Redesign v1.6), seguida de (1) testes cross-browser e (2) PWA / INCC-TR / PDF-XLSX / ITBI.
+**Status em 01/11/2026:** Sprints 1–28 implementadas e validadas (123 testes passando em 10 arquivos, `dist/` 464KB, Dockerização multi-stage + Docker Compose verificados E2E, Sprints 23 e 25–28 com code-audit "Pass"). Redesign v1.6 100% concluído (`design_system/design-system.html`).  
+**Próximo passo:** (1) testes cross-browser e (2) PWA / INCC-TR / PDF-XLSX / ITBI.

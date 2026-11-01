@@ -2,7 +2,7 @@
 
 **Versão:** 1.6  
 **Data:** 31 de Outubro de 2026  
-**Status:** v1.3, v1.4 (refatoração Sprints 13–18, 123 testes / 10 arquivos) e v1.5 (Dockerização e Orquestração, Sprints 19–22) implementados e validados; v1.6 (Redesign baseado em `design_system/design-system.html`, Sprints 23–28) planejado  
+**Status:** v1.3, v1.4 (refatoração Sprints 13–18, 123 testes / 10 arquivos), v1.5 (Dockerização e Orquestração, Sprints 19–22) e v1.6 (Redesign baseado em `design_system/design-system.html`, Sprints 23–28) implementados e validados em 01/11/2026  
 
 ---
 
@@ -785,4 +785,4 @@ calculadora-fi/
 | Overhead de performance com `.spotlight-card` em dispositivos móveis/touch | Baixo | Baixa | Efeito `.spotlight-card::before` só fica visível em `:hover` e atualiza CSS variables leves (`--mouse-x`, `--mouse-y`) diretamente no elemento via `currentTarget.style.setProperty` sem causar re-render no React |
 | Aumento do tamanho do bundle acima de 500KB (NFR-006) | Médio | Baixa | Não instalar bibliotecas pesadas de ícones ou UI (manter SVGs inline leves inspirados em Lucide, como já feito no projeto, e CSS nativo/Tailwind v4) |
 
-**Status do PRD:** v1.3 implementado e validado; v1.4 (refatoração, §28 + Sprints 13–18) implementado e validado (123 testes Vitest passando em 10 arquivos, OxLint e Prettier limpos, build `dist/` ~460KB); v1.5 (Dockerização, §29 + Sprints 19–22) implementado e validado em 22/10/2026; v1.6 (Redesign NectArr Design System, §30 + Sprints 23–28) especificado e pronto para execução incremental.
+**Status do PRD:** v1.3 implementado e validado; v1.4 (refatoração, §28 + Sprints 13–18) implementado e validado (123 testes Vitest passando em 10 arquivos, OxLint e Prettier limpos, build `dist/` ~460KB); v1.5 (Dockerização, §29 + Sprints 19–22) implementado e validado em 22/10/2026; v1.6 (Redesign NectArr Design System, §30 + Sprints 23–28) implementado e validado em 01/11/2026 (123/123 testes, `dist/` 464KB, containers `app`/`dev`/`test` operacionais, zero classes `slate/blue/emerald` residuais, `favicon.svg`/`og-image.svg` e `docs/screenshots/*.png` atualizados).
